@@ -20,6 +20,12 @@
                 <p class="mt-2 text-gray-600">Log in to access your account</p>
             </div>
 
+            @if (session('status'))
+                <div class="bg-green-100 text-green-800 p-4 rounded mb-4">
+                    {{ session('status') }}
+                </div>
+            @endif
+
             @if($errors->any())
                 <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded-lg">
                     <ul class="list-disc list-inside text-red-700">
@@ -44,6 +50,10 @@
                     <input type="password" name="password" 
                            class="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                            required placeholder="Your Password">
+                </div>
+
+                <div class="mt-2 text-right">
+                    <a href="{{ route('password.request') }}" class="text-sm text-blue-500 hover:underline">Forgot Your Password?</a>
                 </div>
 
                 <button type="submit" 
