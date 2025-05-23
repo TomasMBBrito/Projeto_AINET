@@ -21,6 +21,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'gender',
         'photo',
         'nif',
+        'email_verified_at',
         'default_delivery_address',
         'default_payment_type',
         'default_payment_reference',
@@ -31,10 +32,13 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
     ];
 
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'blocked' => 'boolean',
-    ];
+    protected function casts():array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
 
     /**
      * Tipos válidos de utilizador.

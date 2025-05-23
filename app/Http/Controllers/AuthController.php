@@ -39,7 +39,7 @@ class AuthController extends Controller
                 return back()->withErrors(['email' => 'A sua conta está bloqueada.']);
             }
 
-            return redirect()->intended('/');
+            return redirect()->intended('/dashboard');
         }
 
         return back()->withErrors(['email' => 'Credenciais inválidas.'])->onlyInput('email');
@@ -83,8 +83,9 @@ class AuthController extends Controller
 
         // Disparar evento de registo para verificação de email
         event(new Registered($user));
+        Auth::login($user);
 
-        return redirect()->route('login')->with('success', 'Conta criada com sucesso! Verifique o seu email para ativar a conta.');
+        return redirect()->route('verification.notice')->with('success', 'Conta criada com sucesso! Verifique o seu email para ativar a conta.');
     }
 
     public function logout(Request $request)
@@ -92,6 +93,6 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/');
+        return redirect('/login');
     }
 }
