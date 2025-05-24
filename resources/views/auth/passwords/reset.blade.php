@@ -3,6 +3,12 @@
 @section('title', 'Nova Password')
 
 @section('content')
+<div class="absolute inset-0 z-0">
+    <div class="h-full w-full bg-cover bg-center" 
+         style="background-image: url(https://cms.foodclub.com/wp-content/uploads/2024/08/Module-Hero@3x.jpg)">
+        <div class="h-full w-full bg-gray-900/60"></div>
+    </div>
+</div>
 <div class="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
     <h2 class="text-2xl font-bold mb-4">Nova Password</h2>
 

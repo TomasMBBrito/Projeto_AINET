@@ -66,7 +66,7 @@ class AuthController extends Controller
 
         if ($request->hasFile('photo')) {
             $validated['photo'] = $request->file('photo')->store('profile_photos', 'public');
-        }
+        }     
 
         $user = User::create([
             ...$validated,

@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 // Login
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -26,6 +27,15 @@ Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'
 
 Route::post('/email/verification-notification', [VerificationController::class, 'resend'])
     ->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+Route::post('/email/check', function () {
+    $user = Auth::user();
+    if (! $user->email_verified_at == '') {
+        return redirect()->route('login')->with('status', 'Email verificado com sucesso. Pode iniciar sessão.');
+    }
+
+    return back()->withErrors(['email' => 'Ainda não foi feita a verificação do email. Verifique a sua caixa de entrada.']);
+})->middleware('auth')->name('verification.check');
 
 // Recuperação de password
 Route::get('/password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
