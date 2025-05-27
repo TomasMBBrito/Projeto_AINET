@@ -19,6 +19,14 @@
                 Gestão de Utilizadores
             </a>
 
+            <a href="{{ route('catalog.index') }}" class="block w-full text-center bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg">
+                Catálogo
+            </a>
+
+            <a href="{{ route('orders-stock.index') }}" class="block w-full text-center bg-orange-600 hover:bg-orange-700 text-white p-4 rounded-lg">
+                Encomendas/Stock
+            </a>
+
             <form method="POST" action="{{ route('logout') }}" class="mt-4 text-center">
                 @csrf
                 <button type="submit" class="text-red-600 hover:underline">Terminar Sessão</button>

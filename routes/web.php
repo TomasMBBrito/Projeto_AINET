@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserManagementController;
 use app\Http\Controllers\AuthController;
+use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\OrdersStockController;
 
 // Página inicial
 Route::get('/', function () {
@@ -35,6 +37,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/admin/users/{user}/board', [UserManagementController::class, 'toggleBoard'])->name('users.toggleBoard');
         Route::put('/admin/users/restore/{id}', [UserManagementController::class, 'restore'])->name('users.restore');
     });
+
+// Rota pública para o catálogo (acessível a todos)
+Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.public');
+
+// Gestão de catálogo (mantidas para usuários autenticados)
+Route::middleware('auth')->group(function () {
+    Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+    Route::post('/cart/add', [CatalogController::class, 'addToCart'])->name('cart.add');
+});
+
+// Gestão de encomendas e stock (mantidas para usuários autenticados)
+Route::middleware('auth')->group(function () {
+    Route::get('/orders-stock', [OrdersStockController::class, 'index'])->name('orders-stock.index');
+    Route::get('/orders-stock/create', [OrdersStockController::class, 'create'])->name('orders-stock.create');
+    Route::post('/orders-stock', [OrdersStockController::class, 'store'])->name('orders-stock.store');
+    Route::get('/orders-stock/{order}/edit', [OrdersStockController::class, 'edit'])->name('orders-stock.edit');
+    Route::put('/orders-stock/{order}', [OrdersStockController::class, 'update'])->name('orders-stock.update');
+    Route::delete('/orders-stock/{order}', [OrdersStockController::class, 'destroy'])->name('orders-stock.destroy');
+});
+
 });
 
 require __DIR__.'/auth.php';
