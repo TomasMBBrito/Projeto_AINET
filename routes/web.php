@@ -1,24 +1,76 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\UserManagementController;
-use app\Http\Controllers\AuthController;
-use App\Http\Controllers\CatalogController;
-use App\Http\Controllers\OrdersStockController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\{
+    AuthController,
+    ProfileController,
+    UserManagementController,
+    CatalogController,
+    HomeController,
+    OrdersStockController
+};
+
 
 // Página inicial
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::middleware('guest')->group(function () {
+    //login
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    // Registo
+    Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [AuthController::class, 'register']);
+
+    // Recuperação de password
+    Route::get('/password/reset', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
+    Route::post('/password/email', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
+
+    Route::get('/password/reset/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/password/reset', [AuthController::class, 'reset'])->name('password.update');
+
+});
+
+Route::middleware('auth')->group(function () {
+    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+
+    // Verificação de email
+    Route::get('email/verify', [AuthController::class, 'showVerificationNotice'])->name('verification.notice');
+
+    Route::get('email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+        $request->fulfill();
+        return redirect('/');
+    })->middleware(['auth', 'signed'])->name('verification.verify');
+
+    Route::post('email/verification-notification', function (Request $request) {
+        $request->user()->sendEmailVerificationNotification();
+        return back()->with('message', 'Email de verificação reenviado com sucesso!');
+    })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+    
+    Route::post('/email/check', function () {
+        $user = Auth::user();
+        if (! $user->email_verified_at == '') {
+            return redirect()->route('login')->with('status', 'Email verificado com sucesso. Pode iniciar sessão.');
+        }
+
+        return back()->withErrors(['email' => 'Ainda não foi feita a verificação do email. Verifique a sua caixa de entrada.']);
+    })->middleware('auth')->name('verification.check');
+    
+});
+
+// Rota pública para o catálogo (acessível a todos)
+Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+Route::view('/sobre', 'pages.about')->name('about');
+Route::view('/contact', 'pages.about')->name('contact');
+Route::view('/faq', 'pages.about')->name('faq');
 
 // Rotas autenticadas e verificadas
 Route::middleware(['auth', 'verified'])->group(function () {
-
-    // Dashboard
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
 
     // Perfil
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
@@ -38,14 +90,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/admin/users/restore/{id}', [UserManagementController::class, 'restore'])->name('users.restore');
     });
 
-// Rota pública para o catálogo (acessível a todos)
-Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.public');
 
-// Gestão de catálogo (mantidas para usuários autenticados)
-Route::middleware('auth')->group(function () {
-    Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
-    Route::post('/cart/add', [CatalogController::class, 'addToCart'])->name('cart.add');
-});
+//Route::post('/cart/add', [CatalogController::class, 'addToCart'])->name('cart.add');
+
+// // Gestão de catálogo (mantidas para usuários autenticados)
+// Route::middleware('auth')->group(function () {
+//     // Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+    
+// });
 
 // Gestão de encomendas e stock (mantidas para usuários autenticados)
 Route::middleware('auth')->group(function () {
@@ -58,5 +110,3 @@ Route::middleware('auth')->group(function () {
 });
 
 });
-
-require __DIR__.'/auth.php';

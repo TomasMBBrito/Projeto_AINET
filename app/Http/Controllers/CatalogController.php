@@ -38,7 +38,7 @@ class CatalogController extends Controller
         $query->orderBy('name', 'asc');
     }
 
-    $products = $query->get();
+    $products = $query->paginate(12)->withQueryString();
 
     return view('catalog.index', compact('products', 'categories'));
 }

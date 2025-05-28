@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.auth')
 
 @section('title', 'Nova Password')
 
@@ -9,19 +9,21 @@
         <div class="h-full w-full bg-gray-900/60"></div>
     </div>
 </div>
-<div class="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+<div class=" relative z-10 max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
     <h2 class="text-2xl font-bold mb-4">Nova Password</h2>
 
     <form method="POST" action="{{ route('password.update') }}">
         @csrf
 
+        {{-- Token enviado por email --}}
         <input type="hidden" name="token" value="{{ $token }}">
+        <input type="hidden" name="email" value="{{ $email }}">
 
         <label for="email" class="block text-gray-700">Email:</label>
-        <input type="email" name="email" value="{{ old('email') }}" class="w-full mt-1 p-2 border rounded-lg" required>
+        <input type="email" name="email" value="{{ $email ?? old('email') }}" class="w-full mt-1 p-2 border rounded-lg" required>
 
         <label for="password" class="block mt-4 text-gray-700">Nova Password:</label>
-        <input type="password" name="password" class="w-full mt-1 p-2 border rounded-lg" required>
+        <input type="password" name="password" class="w-full mt-1 p-2 border rounded-lg" required autofocus>
 
         <label for="password-confirm" class="block mt-4 text-gray-700">Confirmar Password:</label>
         <input type="password" name="password_confirmation" class="w-full mt-1 p-2 border rounded-lg" required>
