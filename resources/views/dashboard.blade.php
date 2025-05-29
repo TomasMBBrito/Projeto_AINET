@@ -21,8 +21,8 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         @foreach ($featuredProducts ?? [] as $product)
             <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300">
-                <img src="{{ $product->photo ? asset('storage/products/' . $product->photo) : asset('storage/products/product_no_image.png') }}" alt="{{ $product->name }}" class="w-full h-48 object-cover rounded-t-lg">
-                <div class="p-4 text-center">
+                <img src="{{ $product->photo ? asset('storage/products/' . $product->photo) : asset('storage/products/product_no_image.png') }}" alt="{{ $product->name }}" class="w-40 h-40 mx-auto object-cover rounded-lg shadow-md">
+                <div class="p-4 text-center"> 
                     <h3 class="font-semibold text-lg text-gray-800">{{ $product->name }}</h3>
                     <p class="text-green-600 font-bold text-xl mt-2">€{{ number_format($product->price, 2) }}</p>
                     <p class="text-gray-600 mt-2">{{ $product->description }}</p>
