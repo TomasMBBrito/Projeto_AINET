@@ -2,15 +2,16 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-    {{-- Botão de Voltar --}}
-    <div class="mb-4">
-        <a href="{{ route('home') }}" class="inline-flex items-center text-green-700 hover:text-green-900 font-medium">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    {{-- Header with Back to Dashboard and Navbar --}}
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+        {{-- Back to Dashboard --}}
+        <a href="{{ route('home') }}" style="display: inline-flex; align-items: center; color: #15803d; font-weight: 500; text-decoration: none;">
+            <svg xmlns="http://www.w3.org/2000/svg" style="height: 1.25rem; width: 1.25rem; margin-right: 0.5rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
             Back to Dashboard
         </a>
+
     </div>
 
     <h1 class="text-3xl font-bold text-green-800 mb-6">Product catalog</h1>
@@ -118,6 +119,6 @@
                 @endif
             </nav>
         </div>
-    @endif   
+    @endif
 </div>
 @endsection
