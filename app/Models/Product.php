@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+
 class Product extends Model
 {
     use SoftDeletes;
@@ -16,7 +17,14 @@ class Product extends Model
 
     // Relação com a tabela categories
     public function category()
-{
-    return $this->belongsTo(Category::class);
-}
+    {
+        return $this->belongsTo(Category::class)->withTrashed();
+    }
+
+    public function itemsOrders()
+    {
+        return $this->hasMany(ItemOrder::class, 'product_id');
+    }
+
+
 }

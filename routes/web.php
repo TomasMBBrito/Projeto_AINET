@@ -10,7 +10,11 @@ use App\Http\Controllers\{
     UserManagementController,
     CatalogController,
     HomeController,
-    OrdersStockController
+    OrdersStockController,
+    CategoryController,
+    ProductController,
+    BusinessSettingsController,
+    ShippingCostController
 };
 
 
@@ -51,7 +55,7 @@ Route::middleware('auth')->group(function () {
         $request->user()->sendEmailVerificationNotification();
         return back()->with('message', 'Email de verificação reenviado com sucesso!');
     })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
-    
+
     Route::post('/email/check', function () {
         $user = Auth::user();
         if (! $user->email_verified_at == '') {
@@ -60,7 +64,7 @@ Route::middleware('auth')->group(function () {
 
         return back()->withErrors(['email' => 'Ainda não foi feita a verificação do email. Verifique a sua caixa de entrada.']);
     })->middleware('auth')->name('verification.check');
-    
+
 });
 
 // Rota pública para o catálogo (acessível a todos)
@@ -96,7 +100,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // // Gestão de catálogo (mantidas para usuários autenticados)
 // Route::middleware('auth')->group(function () {
 //     // Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
-    
+
 // });
 
 // Gestão de encomendas e stock (mantidas para usuários autenticados)
@@ -108,5 +112,34 @@ Route::middleware('auth')->group(function () {
     Route::put('/orders-stock/{order}', [OrdersStockController::class, 'update'])->name('orders-stock.update');
     Route::delete('/orders-stock/{order}', [OrdersStockController::class, 'destroy'])->name('orders-stock.destroy');
 });
+
+//BussinesSettings
+Route::middleware(['auth'])->group(function () {
+    //Categorias | Feito
+    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');  //Página index das categorias
+    Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create'); //Criar categoria
+    Route::get('/categories/{category}', [CategoryController::class, 'edit'])->name('categories.edit'); //Editar categoria
+    Route::post('/categories/store', [CategoryController::class, 'store'])->name('categories.store');   //Armazenar categoria
+    Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update'); //Atualizar categoria
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');    //Eliminar categoria
+    Route::post('/categories/restore/{id}', [CategoryController::class, 'restore'])->name('categories.restore');    //Restaurar categoria -> ainda não funciona
+
+    //Produtos | Feito c/filtragem
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');   //Página index dos produtos
+    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create'); //Criar produto
+    Route::post('/products/store', [ProductController::class, 'store'])->name('products.store'); //Armazena produto
+    Route::get('/products/{product}', [ProductController::class, 'edit'])->name('products.edit'); //Editar produto
+    Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update'); //Atualizar produto
+    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy'); //Eliminar produto
+    Route::post('/products/restore/{id}', [ProductController::class, 'restore'])->name('products.restore'); //Eliminação reversível do produto (restaurar)
+
+    //Taxa de adesão | Feito
+    Route::get('general', [BusinessSettingsController::class, 'edit'])->name('settings.edit');
+    Route::post('general', [BusinessSettingsController::class, 'update'])->name('settings.update');
+
+    //Custos de envio
+
+});
+
 
 });
