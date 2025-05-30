@@ -89,7 +89,7 @@ class AuthController extends Controller
         event(new Registered($user));
         Auth::login($user);
 
-        return redirect()->route('verification.notice')->with('success', 'Conta criada com sucesso! Verifique o seu email para ativar a conta.');
+        return redirect()->route('verification.send')->with('success', 'Conta criada com sucesso! Verifique o seu email para ativar a conta.');
     }
 
     public function logout(Request $request)
@@ -156,11 +156,28 @@ class AuthController extends Controller
         return view('auth.verify');
     }
 
-    // Lidar com a verificação do email (quando o utilizador clica no link)
+    // Verificar email (link do email)
     public function verify(EmailVerificationRequest $request)
     {
-        $request->fulfill(); // marca o email como verificado
+        $request->fulfill();
+        return redirect('/');
+    }
 
-        return redirect('/'); // ou para onde quiseres
+    // Reenviar email de verificação
+    public function resendVerificationEmail(Request $request)
+    {
+        $request->user()->sendEmailVerificationNotification();
+        return back()->with('message', 'Email de verificação reenviado com sucesso!');
+    }
+
+    // Check manual para saber se o email já foi verificado (ex: botão "Já verifiquei")
+    public function checkEmailVerified(Request $request)
+    {
+        $user = $request->user();
+        if ($user->email_verified_at !== null) {
+            return redirect()->route('login')->with('status', 'Email verificado com sucesso. Pode iniciar sessão.');
+        }
+
+        return back()->withErrors(['email' => 'Ainda não foi feita a verificação do email. Verifique a sua caixa de entrada.']);
     }
 }

@@ -41,13 +41,13 @@ class ProductController extends Controller
         $products = $query->paginate(10)->withQueryString();
         $categories = Category::all();
 
-        return view('admin.settings.products.index', compact('products', 'categories'));
+        return view('admin.products.index', compact('products', 'categories'));
     }
 
     public function create()
     {
         $categories = Category::all();
-        return view('admin.settings.products.create', compact('categories'));
+        return view('admin.products.create', compact('categories'));
     }
 
     public function store(Request $request)
@@ -77,7 +77,7 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $categories = Category::all();
-        return view('admin.settings.products.edit', compact('product', 'categories'));
+        return view('admin.products.edit', compact('product', 'categories'));
     }
 
     public function update(Request $request, Product $product)

@@ -13,10 +13,9 @@
     @endif
 
     <div class="flex justify-between items-center mb-4">
-        <form method="GET" action="{{ route('users.index') }}" class="flex gap-2">
-            <input type="text" name="search" placeholder="Procurar..." class="border p-2 rounded"
-                value="{{ request('search') }}">
-            <select name="type" class="border p-2 rounded">
+        <form method="GET" action="{{ route('users.index') }}" class="flex gap-2 flex-wrap">
+            <input type="text" name="search" placeholder="Procurar..." class="border border-gray-300 p-2 rounded" value="{{ request('search') }}">
+            <select name="type" class="border border-gray-300 p-2 rounded">
                 <option value="">Todos</option>
                 <option value="member" {{ request('type') == 'member' ? 'selected' : '' }}>Membro</option>
                 <option value="board" {{ request('type') == 'board' ? 'selected' : '' }}>Direção</option>
@@ -28,8 +27,8 @@
         <a href="{{ route('users.create') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Novo Funcionário</a>
     </div>
 
-    <table class="w-full table-auto border">
-        <thead class="bg-gray-200">
+    <table class="w-full table-auto border text-sm">
+        <thead class="bg-gray-100 text-left">
             <tr>
                 <th class="p-2">ID</th>
                 <th>Nome</th>
@@ -41,52 +40,70 @@
         </thead>
         <tbody>
             @foreach ($users as $user)
-                <tr class="border-b">
+                <tr class="border-b hover:bg-gray-50">
                     <td class="p-2">{{ $user->id }}</td>
                     <td>{{ $user->name }}</td>
                     <td>{{ $user->email }}</td>
-                    <td>{{ $user->type }}</td>
+                    <td>{{ ucfirst($user->type) }}</td>
                     <td>{{ $user->blocked ? 'Sim' : 'Não' }}</td>
-                    <td class="flex gap-2 py-2">
-                        <a href="{{ route('users.edit', $user) }}" class="text-blue-600 hover:underline">Editar</a>
+                    <td class="flex flex-wrap gap-2 py-2">
 
+                        {{-- Editar --}}
+                        <a href="{{ route('users.edit', $user) }}" 
+                           class="inline-flex items-center bg-blue-500 text-white px-5 py-3 rounded hover:bg-blue-600 transition">
+                            Editar
+                        </a>
+
+                        {{-- Restaurar ou Cancelar --}}
                         @if ($user->trashed())
                             <form method="POST" action="{{ route('users.restore', $user->id) }}">
-                                @csrf @method('PUT')
-                                <button class="text-yellow-600 hover:underline">Restaurar</button>
+                                @csrf 
+                                @method('PUT')
+                                <button type="submit" class="inline-flex items-center bg-yellow-500 text-white px-5 py-3 rounded hover:bg-yellow-600 transition">
+                                    Restaurar
+                                </button>
                             </form>
                         @else
                             <form method="POST" action="{{ route('users.destroy', $user) }}">
-                                @csrf @method('DELETE')
-                                <button onclick="return confirm('Cancelar subscrição?')" class="text-red-600 hover:underline">
+                                @csrf 
+                                @method('DELETE')
+                                <button onclick="return confirm('Cancelar subscrição?')" 
+                                        class="inline-flex items-center bg-red-500 text-white px-5 py-3 rounded hover:bg-red-600 transition">
                                     Cancelar
                                 </button>
                             </form>
                         @endif
 
+                        {{-- Promover/Rebaixar --}}
                         @if (in_array($user->type, ['member', 'board']) && $user->id !== auth()->id())
                             <form method="POST" action="{{ route('users.toggleBoard', $user) }}">
-                                @csrf @method('PUT')
-                                <button class="text-purple-600 hover:underline">
-                                    {{ $user->type === 'member' ? 'Promover a direção' : 'Rebaixar para membro' }}
+                                @csrf 
+                                @method('PUT')
+                                <button type="submit" class="inline-flex items-center bg-purple-500 text-white px-5 py-3 rounded hover:bg-purple-600 transition">
+                                    {{ $user->type === 'member' ? 'Promover' : 'Rebaixar' }}
                                 </button>
                             </form>
                         @endif
 
+                        {{-- Bloquear/Desbloquear --}}
                         @if ($user->type !== 'employee')
                             <form method="POST" action="{{ route('users.block', $user) }}">
-                                @csrf @method('PUT')
-                                <button class="text-orange-600 hover:underline">
+                                @csrf 
+                                @method('PUT')
+                                <button type="submit" class="inline-flex items-center bg-orange-500 text-white px-5 py-3 rounded hover:bg-orange-600 transition">
                                     {{ $user->blocked ? 'Desbloquear' : 'Bloquear' }}
                                 </button>
                             </form>
                         @endif
+
                     </td>
                 </tr>
             @endforeach
         </tbody>
     </table>
 
-    <div class="mt-4">{{ $users->links() }}</div>
+    <div class="mt-6">
+        {{ $users->links() }}
+    </div>
 </div>
 @endsection

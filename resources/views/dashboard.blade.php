@@ -26,7 +26,7 @@
                 @if (is_object($product))
                     <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300">
                         <img src="{{ $product->photo ? asset('storage/products/' . $product->photo) : asset('storage/products/product_no_image.png') }}"
-                            alt="{{ $product->name }}" class="w-full h-48 object-cover rounded-t-lg">
+                            alt="{{ $product->name }}" class="w-40 h-40 object-cover mx-auto rounded-lg shadow-md">
                         <div class="p-4 text-center">
                             <h3 class="font-semibold text-lg text-gray-800">{{ $product->name }}</h3>
                             <p class="text-green-600 font-bold text-xl mt-2">€{{ number_format($product->price, 2) }}</p>

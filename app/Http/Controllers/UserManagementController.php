@@ -52,7 +52,7 @@ class UserManagementController extends Controller
 
         User::create($validated);
 
-        return redirect()->route('users.index')->with('success', 'Funcionário adicionado com sucesso!');
+        return redirect()->route('admin.users.index')->with('success', 'Funcionário adicionado com sucesso!');
     }
 
     public function edit(User $user)
@@ -85,7 +85,7 @@ class UserManagementController extends Controller
 
         $user->update($data);
 
-        return redirect()->route('users.index')->with('success', 'Utilizador atualizado com sucesso!');
+        return redirect()->route('admin.users.index')->with('success', 'Utilizador atualizado com sucesso!');
     }
 
     public function destroy(User $user)
@@ -96,7 +96,7 @@ class UserManagementController extends Controller
 
         $user->delete();
 
-        return redirect()->route('users.index')->with('success', 'Subscrição cancelada (soft delete).');
+        return redirect()->route('admin.users.index')->with('success', 'Subscrição cancelada (soft delete).');
     }
 
     public function toggleBlock(User $user)
@@ -104,7 +104,7 @@ class UserManagementController extends Controller
         $user->blocked = !$user->blocked;
         $user->save();
 
-        return redirect()->route('users.index')->with('success', 'Estado de bloqueio atualizado.');
+        return redirect()->route('admin.users.index')->with('success', 'Estado de bloqueio atualizado.');
     }
 
     public function toggleBoard(User $user)
@@ -117,7 +117,7 @@ class UserManagementController extends Controller
 
         $user->save();
 
-        return redirect()->route('users.index')->with('success', 'Tipo de utilizador atualizado.');
+        return redirect()->route('admin.users.index')->with('success', 'Tipo de utilizador atualizado.');
     }
 
     public function restore($id)
@@ -125,6 +125,17 @@ class UserManagementController extends Controller
         $user = User::withTrashed()->findOrFail($id);
         $user->restore();
 
-        return redirect()->route('users.index')->with('success', 'Conta restaurada.');
+        return redirect()->route('admin.users.index')->with('success', 'Conta restaurada.');
     }
+
+    // public function testGate()
+    // {
+    //     $user = auth()->user();
+    //     dd($user->type);
+    //     if ($user->can('manageSite')) {
+    //         return 'Autorizado';
+    //     } else {
+    //         return 'Não autorizado';
+    //     }
+    // }
 }

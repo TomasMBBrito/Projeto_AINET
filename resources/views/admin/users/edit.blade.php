@@ -27,7 +27,7 @@
         <label class="block font-medium">Foto de perfil</label>
         <input type="file" name="photo" class="w-full mb-4 p-2 border rounded">
 
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Atualizar</button>
+        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Atualizar</button>
     </form>
 </div>
 @endsection

@@ -10,7 +10,7 @@ class BusinessSettingsController extends Controller
     public function edit()
     {
         $setting = Setting::first();
-        return view('admin.settings.general', compact('setting'));
+        return view('admin.settings.membership_fee', compact('setting'));
     }
 
     public function update(Request $request)
@@ -22,6 +22,6 @@ class BusinessSettingsController extends Controller
         $setting = Setting::first();
         $setting->update($validated);
 
-        return redirect()->route('settings.edit')->with('success', 'Taxa de adesão atualizada com sucesso.');
+        return redirect()->route('admin.settings.membership_fee')->with('success', 'Taxa de adesão atualizada com sucesso.');
     }
 }
