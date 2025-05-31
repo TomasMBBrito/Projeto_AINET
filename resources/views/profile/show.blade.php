@@ -3,7 +3,7 @@
 @section('title', 'O Meu Perfil')
 
 @section('content')
-<div class="max-w-4xl mx-auto mt-10 p-8 bg-white shadow rounded-xl">
+<div class="max-w-4xl mx-auto mt-10 mb-5 p-8 bg-white shadow rounded-xl">
     <h2 class="text-3xl font-bold mb-6">My profile</h2>
 
     {{-- Mensagem de sucesso --}}
@@ -76,7 +76,7 @@
 
         <div class="pt-4">
             <button type="submit"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg">
+                class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg">
                 Save changes
             </button>
         </div>
@@ -108,7 +108,7 @@
                 class="w-full mt-1 p-3 border border-gray-300 rounded-lg">
         </div>
 
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg">
+        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-lg">
             Change Password
         </button>
     </form>

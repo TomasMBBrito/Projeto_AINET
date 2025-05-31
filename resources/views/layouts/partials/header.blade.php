@@ -17,10 +17,13 @@
             @auth
                 @if(Auth::user()->type === 'board')
                     <div class="relative group">
+                        <!-- Botão principal -->
                         <a href="#" class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
                             <i data-lucide="settings" class="w-4 h-4"></i> Admin Panel
                         </a>
-                        <ul class="absolute hidden group-hover:block bg-green-800 rounded shadow-lg min-w-[150px] z-50 mt-2 right-0">
+
+                        <!-- Submenu -->
+                        <ul class="absolute hidden group-hover:block bg-green-800 rounded shadow-lg min-w-[150px] z-50 right-0">
                             <li>
                                 <a href="{{ route('users.index') }}" class="block px-4 py-2 text-white hover:bg-green-700 transition">Users</a>
                             </li>
@@ -34,7 +37,7 @@
                                 <a href="{{ route('settings.edit') }}" class="block px-4 py-2 text-white hover:bg-green-700 transition">Membership Fee</a>
                             </li>
                             <li>
-                                <a href="{{ route('shipping-cost.index') }}" class="block px-4 py-2 text-white hover:bg-green-700 transition">Shipping cost</a>
+                                <a href="{{ route('shipping_cost.index') }}" class="block px-4 py-2 text-white hover:bg-green-700 transition">Shipping cost</a>
                             </li>
                         </ul>
                     </div>

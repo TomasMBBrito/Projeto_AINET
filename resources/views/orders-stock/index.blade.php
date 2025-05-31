@@ -8,7 +8,7 @@
         <h2 class="text-3xl font-bold text-gray-800 mb-4">Encomendas/Stock</h2>
         <p class="text-gray-600 mb-6">Aqui você pode gerenciar encomendas e stock.</p>
         <!-- Adicione o conteúdo de encomendas/stock aqui -->
-        <a href="{{ route('home') }}" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg mt-4">
+        <a href="{{ route('home') }}" class="block w-full text-center bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg mt-4">
             Voltar ao Dashboard
         </a>
     </div>

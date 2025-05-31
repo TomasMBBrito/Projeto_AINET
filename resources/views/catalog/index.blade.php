@@ -18,6 +18,8 @@
 
     {{-- Filtros --}}
     <form method="GET" class="flex flex-wrap gap-4 mb-8">
+        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name..."
+            class="border border-green-300 rounded px-3 py-2 shadow-sm focus:ring-green-500"/>
         <select name="category" class="border border-green-300 rounded px-3 py-2 shadow-sm focus:ring-green-500">
             <option value="">All categories</option>
             @foreach ($categories as $category)

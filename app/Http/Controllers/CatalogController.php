@@ -14,6 +14,11 @@ class CatalogController extends Controller
 
     $query = Product::with('category');
 
+    //Filtro por nome
+    if ($request->filled('search')) {
+        $query->where('name', 'like', '%' . $request->search . '%');
+    }
+
     // Filtro por categoria
     if ($request->filled('category')) {
         $query->where('category_id', $request->category);
