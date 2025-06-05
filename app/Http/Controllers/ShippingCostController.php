@@ -9,49 +9,50 @@ class ShippingCostController extends Controller
 {
     public function index()
     {
-        $settings = ShippingCost::orderBy('min_value_threshold')->get();
-        return view('admin.settings.shipping_cost.index', compact('settings'));
+        $shippingCosts = ShippingCost::orderBy('min_value_threshold')->paginate(10);
+        return view('admin.settings.shipping_costs.index', compact('shippingCosts'));
     }
 
-    // public function create()
-    // {
-    //     return view('admin.settings.shipping_costs.create');
-    // }
 
-    // public function store(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'min_value_threshold' => 'required|numeric|min:0',
-    //         'max_value_threshold' => 'required|numeric|gt:min_value_threshold',
-    //         'shipping_cost' => 'required|numeric|min:0',
-    //     ]);
+    public function create()
+    {
+        return view('admin.settings.shipping_costs.create');
+    }
 
-    //     ShippingCostSetting::create($validated);
 
-    //     return redirect()->route('admin.settings.shipping_costs.index')->with('success', 'Intervalo de custo de envio criado.');
-    // }
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'min_value_threshold' => 'required|numeric|min:0',
+            'max_value_threshold' => 'required|numeric|gt:min_value_threshold',
+            'shipping_cost' => 'required|numeric|min:0',
+        ]);
 
-    // public function edit(ShippingCostSetting $shippingCostSetting)
-    // {
-    //     return view('admin.settings.shipping_costs.edit', compact('shippingCostSetting'));
-    // }
+        ShippingCost::create($validated);
 
-    // public function update(Request $request, ShippingCostSetting $shippingCostSetting)
-    // {
-    //     $validated = $request->validate([
-    //         'min_value_threshold' => 'required|numeric|min:0',
-    //         'max_value_threshold' => 'required|numeric|gt:min_value_threshold',
-    //         'shipping_cost' => 'required|numeric|min:0',
-    //     ]);
+        return redirect()->route('admin.settings.shipping_costs.index')->with('success', 'Intervalo de custo de envio criado.');
+    }
 
-    //     $shippingCostSetting->update($validated);
+    public function edit(ShippingCost $shippingCost)
+    {
+        return view('admin.settings.shipping_costs.edit', compact('shippingCost'));
+    }
 
-    //     return redirect()->route('admin.settings.shipping_costs.index')->with('success', 'Intervalo atualizado com sucesso.');
-    // }
+    public function update(Request $request, ShippingCost $shippingCost)
+    {
+        $validated = $request->validate([
+            'min_value_threshold' => 'required|numeric|min:0',
+            'max_value_threshold' => 'required|numeric|gt:min_value_threshold',
+            'shipping_cost' => 'required|numeric|min:0',
+        ]);
 
-    // public function destroy(ShippingCostSetting $shippingCostSetting)
-    // {
-    //     $shippingCostSetting->delete();
-    //     return back()->with('success', 'Intervalo removido com sucesso.');
-    // }
+        $shippingCost->update($validated);
+
+        return redirect()->route('admin.settings.shipping_costs.index')->with('success', 'Intervalo atualizado com sucesso.');
+    }
+    public function destroy(ShippingCost $shippingCost)
+    {
+        $shippingCost->delete();
+        return back()->with('success', 'Intervalo removido com sucesso.');
+    }
 }

@@ -42,7 +42,7 @@
                                 <a href="{{ route('settings.edit') }}" class="block px-4 py-2 text-white hover:bg-green-700 transition">Membership Fee</a>
                             </li>
                             <li>
-                                <a href="{{ route('shipping_cost.index') }}" class="block px-4 py-2 text-white hover:bg-green-700 transition">Shipping cost</a>
+                                <a href="{{ route('admin.settings.shipping_costs.index') }}" class="block px-4 py-2 text-white hover:bg-green-700 transition">Shipping cost</a>
                             </li>
                         </ul>
                     </div>

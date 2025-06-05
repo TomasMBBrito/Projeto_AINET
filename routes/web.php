@@ -53,8 +53,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/email/check', [AuthController::class, 'checkEmailVerified'])->name('verification.check');
 
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])
-    ->middleware(['auth', 'signed', 'throttle:6,1'])
-    ->name('verification.verify');
+        ->middleware(['auth', 'signed', 'throttle:6,1'])
+        ->name('verification.verify');
 
 });
 
@@ -89,41 +89,57 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Gestão do website (apenas direção)
     //Route::middleware('can:manageSite')->group(function () {
-        Route::get('/admin/users', [UserManagementController::class, 'index'])->name('users.index');
-        Route::get('/admin/users/create', [UserManagementController::class, 'create'])->name('users.create');
-        Route::post('/admin/users', [UserManagementController::class, 'store'])->name('users.store');
-        Route::get('/admin/users/{user}/edit', [UserManagementController::class, 'edit'])->name('users.edit');
-        Route::put('/admin/users/{user}', [UserManagementController::class, 'update'])->name('users.update');
-        Route::delete('/admin/users/{user}', [UserManagementController::class, 'destroy'])->name('users.destroy');
-        Route::put('/admin/users/{user}/block', [UserManagementController::class, 'toggleBlock'])->name('users.block');
-        Route::put('/admin/users/{user}/board', [UserManagementController::class, 'toggleBoard'])->name('users.toggleBoard');
-        Route::put('/admin/users/restore/{id}', [UserManagementController::class, 'restore'])->name('users.restore');
+    Route::get('/admin/users', [UserManagementController::class, 'index'])->name('users.index');
+    Route::get('/admin/users/create', [UserManagementController::class, 'create'])->name('users.create');
+    Route::post('/admin/users', [UserManagementController::class, 'store'])->name('users.store');
+    Route::get('/admin/users/{user}/edit', [UserManagementController::class, 'edit'])->name('users.edit');
+    Route::put('/admin/users/{user}', [UserManagementController::class, 'update'])->name('users.update');
+    Route::delete('/admin/users/{user}', [UserManagementController::class, 'destroy'])->name('users.destroy');
+    Route::put('/admin/users/{user}/block', [UserManagementController::class, 'toggleBlock'])->name('users.block');
+    Route::put('/admin/users/{user}/board', [UserManagementController::class, 'toggleBoard'])->name('users.toggleBoard');
+    Route::put('/admin/users/restore/{id}', [UserManagementController::class, 'restore'])->name('users.restore');
 
-        Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');  //Página index das categorias
-        Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create'); //Criar categoria
-        Route::get('/categories/{category}', [CategoryController::class, 'edit'])->name('categories.edit'); //Editar categoria
-        Route::post('/categories/store', [CategoryController::class, 'store'])->name('categories.store');   //Armazenar categoria
-        Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update'); //Atualizar categoria
-        Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');    //Eliminar categoria
-        Route::post('/categories/restore/{id}', [CategoryController::class, 'restore'])->name('categories.restore');    //Restaurar categoria -> ainda não funciona
+    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');  //Página index das categorias
+    Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create'); //Criar categoria
+    Route::get('/categories/{category}', [CategoryController::class, 'edit'])->name('categories.edit'); //Editar categoria
+    Route::post('/categories/store', [CategoryController::class, 'store'])->name('categories.store');   //Armazenar categoria
+    Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update'); //Atualizar categoria
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');    //Eliminar categoria
+    Route::post('/categories/restore/{id}', [CategoryController::class, 'restore'])->name('categories.restore');    //Restaurar categoria -> ainda não funciona
 
-        //Produtos | Feito c/filtragem
-        Route::get('/products', [ProductController::class, 'index'])->name('products.index');   //Página index dos produtos
-        Route::get('/products/create', [ProductController::class, 'create'])->name('products.create'); //Criar produto
-        Route::post('/products/store', [ProductController::class, 'store'])->name('products.store'); //Armazena produto
-        Route::get('/products/{product}', [ProductController::class, 'edit'])->name('products.edit'); //Editar produto
-        Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update'); //Atualizar produto
-        Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy'); //Eliminar produto
-        Route::post('/products/restore/{id}', [ProductController::class, 'restore'])->name('products.restore'); //Eliminação reversível do produto (restaurar)
+    //Produtos | Feito c/filtragem
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');   //Página index dos produtos
+    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create'); //Criar produto
+    Route::post('/products/store', [ProductController::class, 'store'])->name('products.store'); //Armazena produto
+    Route::get('/products/{product}', [ProductController::class, 'edit'])->name('products.edit'); //Editar produto
+    Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update'); //Atualizar produto
+    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy'); //Eliminar produto
+    Route::post('/products/restore/{id}', [ProductController::class, 'restore'])->name('products.restore'); //Eliminação reversível do produto (restaurar)
 
-        //Taxa de adesão | Feito
-        Route::get('membership_fee', [BusinessSettingsController::class, 'edit'])->name('settings.edit');
-        Route::post('/membership_fee', [BusinessSettingsController::class, 'update'])->name('settings.update');
+    //Taxa de adesão | Feito
+    Route::get('membership_fee', [BusinessSettingsController::class, 'edit'])->name('settings.edit');
+    Route::post('/membership_fee', [BusinessSettingsController::class, 'update'])->name('settings.update');
 
+<<<<<<< HEAD
+    //Custos de envio
+    // Custos de envio
+    Route::get('/admin/settings/shipping-costs', [ShippingCostController::class, 'index'])->name('admin.settings.shipping_costs.index'); // Lista de custos de envio
+    Route::get('/admin/settings/shipping-costs/create', [ShippingCostController::class, 'create'])->name('admin.settings.shipping_costs.create'); // Criar novo custo de envio
+    Route::post('/admin/settings/shipping-costs/store', [ShippingCostController::class, 'store'])->name('admin.settings.shipping_costs.store'); // Armazenar novo custo de envio
+    Route::get('/admin/settings/shipping-costs/{shippingCost}/edit', [ShippingCostController::class, 'edit'])->name('admin.settings.shipping_costs.edit'); // Editar custo de envio
+    Route::put('/admin/settings/shipping-costs/{shippingCost}', [ShippingCostController::class, 'update'])->name('admin.settings.shipping_costs.update'); // Atualizar custo de envio existente
+    Route::delete('/admin/settings/shipping-costs/{shippingCost}', [ShippingCostController::class, 'destroy'])->name('admin.settings.shipping_costs.destroy');
+
+
+});
+=======
         //Custos de envio
         Route::get('/shipping-cost', [ShippingCostController::class, 'index'])->name('shipping_cost.index');
 
     });
+>>>>>>> b94fefda6400dc917642da8999f7e0f21629e2a5
+
+
 
 
 
