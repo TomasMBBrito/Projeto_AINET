@@ -14,7 +14,8 @@ use App\Http\Controllers\{
     CategoryController,
     ProductController,
     BusinessSettingsController,
-    ShippingCostController
+    ShippingCostController,
+    CartController
 };
 
 
@@ -57,8 +58,14 @@ Route::middleware('auth')->group(function () {
 
 });
 
-// Rota pública para o catálogo (acessível a todos)
+// Rotas públicas (acessíveis a todos)
 Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
 Route::view('/sobre', 'pages.about')->name('about');
 Route::view('/contact', 'pages.about')->name('contact');
 Route::view('/faq', 'pages.about')->name('faq');
@@ -115,7 +122,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         //Custos de envio
         Route::get('/shipping-cost', [ShippingCostController::class, 'index'])->name('shipping_cost.index');
+
     });
+
+
 
 //});
 //Route::post('/cart/add', [CatalogController::class, 'addToCart'])->name('cart.add');

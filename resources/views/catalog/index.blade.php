@@ -11,7 +11,6 @@
             </svg>
             Back to Dashboard
         </a>
-
     </div>
 
     <h1 class="text-3xl font-bold text-green-800 mb-6">Product catalog</h1>
@@ -82,19 +81,27 @@
             <div class="mt-4 flex items-center justify-between">
                 @if ($product->stock <= 0)
                     <span class="text-xs text-red-500 font-semibold">Out of stock</span>
+                    <button class="bg-gray-400 text-white px-3 py-1 rounded text-sm cursor-not-allowed" disabled>
+                        Add to cart
+                    </button>
                 @else
                     <span class="text-xs text-green-600 font-semibold">In stock</span>
+                    <form action="{{ route('cart.add') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        <input type="number" name="quantity" value="1" min="1" max="{{ $product->stock }}"
+                            class="w-16 p-1 border rounded mr-2">
+                        <button type="submit" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm">
+                            Add to cart
+                        </button>
+                    </form>
                 @endif
-
-                <button class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm">
-                    Add to cart
-                </button>
             </div>
         </div>
         @endforeach
     </div>
-        {{-- Paginação --}}
-        @if ($products->hasPages())
+    {{-- Paginação --}}
+    @if ($products->hasPages())
         <div class="mt-10 flex justify-center w-full">
             <nav role="navigation" class="flex flex-wrap justify-center w-full max-w-4xl rounded-lg shadow-md bg-white border border-gray-300 overflow-hidden">
                 {{-- Página anterior --}}

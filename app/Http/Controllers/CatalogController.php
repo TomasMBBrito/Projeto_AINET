@@ -9,66 +9,43 @@ use App\Models\Category;
 class CatalogController extends Controller
 {
     public function index(Request $request)
-{
-    $categories = Category::orderBy('name')->get();
-
-    $query = Product::with('category');
-
-    //Filtro por nome
-    if ($request->filled('search')) {
-        $query->where('name', 'like', '%' . $request->search . '%');
-    }
-
-    // Filtro por categoria
-    if ($request->filled('category')) {
-        $query->where('category_id', $request->category);
-    }
-
-    // Ordenação
-    if ($request->filled('sort')) {
-        switch ($request->sort) {
-            case 'name_asc':
-                $query->orderBy('name', 'asc');
-                break;
-            case 'price_asc':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price_desc':
-                $query->orderBy('price', 'desc');
-                break;
-            default:
-                $query->orderBy('name', 'asc');
-        }
-    } else {
-        $query->orderBy('name', 'asc');
-    }
-
-    $products = $query->paginate(12)->withQueryString();
-
-    return view('catalog.index', compact('products', 'categories'));
-}
-
-    public function addToCart(Request $request)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
-        ]);
+        $categories = Category::orderBy('name')->get();
 
-        // Exemplo simples de carrinho na sessão
-        $cart = session()->get('cart', []);
+        $query = Product::with('category');
 
-        $productId = $request->product_id;
-        $quantity = $request->quantity;
-
-        if (isset($cart[$productId])) {
-            $cart[$productId] += $quantity;
-        } else {
-            $cart[$productId] = $quantity;
+        // Filtro por nome
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        session()->put('cart', $cart);
+        // Filtro por categoria
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
 
-        return redirect()->back()->with('success', 'Produto adicionado ao carrinho!');
+        // Ordenação
+        if ($request->filled('sort')) {
+            switch ($request->sort) {
+                case 'name_asc':
+                    $query->orderBy('name', 'asc');
+                    break;
+                case 'price_asc':
+                    $query->orderBy('price', 'asc');
+                    break;
+                case 'price_desc':
+                    $query->orderBy('price', 'desc');
+                    break;
+                default:
+                    $query->orderBy('name', 'asc');
+            }
+        } else {
+            $query->orderBy('name', 'asc');
+        }
+
+        $products = $query->paginate(12)->withQueryString();
+
+        return view('catalog.index', compact('products', 'categories'));
     }
 }
+?>

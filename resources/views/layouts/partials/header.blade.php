@@ -11,7 +11,12 @@
         <!-- Navegação -->
         <nav class="flex items-center space-x-3 text-sm">
             <a href="{{ route('catalog.index') }}" class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
-                <i data-lucide="shopping-cart" class="w-4 h-4"></i> Catalog
+                <i data-lucide="list" class="w-4 h-4"></i> Catalog
+            </a>
+
+            <!-- Novo botão de carrinho de compras -->
+            <a href="{{ route('cart.index') }}" class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
+                <i data-lucide="shopping-cart" class="w-4 h-4"></i> Cart
             </a>
 
             @auth
@@ -46,7 +51,7 @@
                     <i data-lucide="package" class="w-4 h-4"></i> My Purchases
                 </a>
 
-                <a href="{{ route('profile.show') }}" class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
+                <a href="{{ route('profile.show') }}" class="-flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
                     <i data-lucide="user" class="w-4 h-4"></i> Profile
                 </a>
 
@@ -57,18 +62,17 @@
                     </button>
                 </form>
             @else
-            <a href="{{ route('login') }}" class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
-                <i data-lucide="log-in" class="w-4 h-4"></i> Login
-            </a>
+                <a href="{{ route('login') }}" class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
+                    <i data-lucide="log-in" class="w-4 h-4"></i> Login
+                </a>
 
-            <a href="{{ route('register') }}" class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
-                <i data-lucide="user-plus" class="w-4 h-4"></i> Sign Up
-            </a>
+                <a href="{{ route('register') }}" class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i> Sign Up
+                </a>
             @endauth
         </nav>
     </div>
 </header>
-
 
 <script>
     lucide.createIcons();
