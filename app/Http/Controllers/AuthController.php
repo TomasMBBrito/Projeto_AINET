@@ -43,6 +43,7 @@ class AuthController extends Controller
                 return back()->withErrors(['email' => 'A sua conta está bloqueada.']);
             }
 
+            CartController::syncCartAfterLogin(Auth::user());
             return redirect()->intended('/');
         }
 

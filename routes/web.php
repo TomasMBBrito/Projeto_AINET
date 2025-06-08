@@ -120,9 +120,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('membership_fee', [BusinessSettingsController::class, 'edit'])->name('settings.edit');
     Route::post('/membership_fee', [BusinessSettingsController::class, 'update'])->name('settings.update');
 
-<<<<<<< HEAD
     //Custos de envio
-    // Custos de envio
     Route::get('/admin/settings/shipping-costs', [ShippingCostController::class, 'index'])->name('admin.settings.shipping_costs.index'); // Lista de custos de envio
     Route::get('/admin/settings/shipping-costs/create', [ShippingCostController::class, 'create'])->name('admin.settings.shipping_costs.create'); // Criar novo custo de envio
     Route::post('/admin/settings/shipping-costs/store', [ShippingCostController::class, 'store'])->name('admin.settings.shipping_costs.store'); // Armazenar novo custo de envio
@@ -132,12 +130,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 });
-=======
-        //Custos de envio
-        Route::get('/shipping-cost', [ShippingCostController::class, 'index'])->name('shipping_cost.index');
-
-    });
->>>>>>> b94fefda6400dc917642da8999f7e0f21629e2a5
 
 
 
