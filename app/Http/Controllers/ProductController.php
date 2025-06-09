@@ -95,6 +95,21 @@ class ProductController extends Controller
             'stock_upper_limit' => 'required|integer|min:1|gt:stock_lower_limit',
         ]);
 
+        // Verificação dos limites de stock
+        if (
+            !$request->has('confirm_stock_limit') &&
+            ($request->stock <= $request->stock_lower_limit || $request->stock >= $request->stock_upper_limit)
+        ) {
+            return redirect()->back()
+                ->withInput()
+                ->with('stock_warning', [
+                    'message' => $request->stock <= $request->stock_lower_limit
+                        ? 'O stock está abaixo do limite mínimo! Confirme para continuar.'
+                        : 'O stock atingiu o limite máximo! Confirme para continuar.'
+                ]);
+        }
+
+        // Atualização da imagem (se fornecida)
         if ($request->hasFile('image')) {
             if ($product->photo) {
                 Storage::disk('public')->delete($product->photo);
@@ -106,7 +121,6 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')->with('success', 'Produto atualizado com sucesso!');
     }
-
     public function destroy(Product $product)
     {
         if ($product->itemsOrders()->exists()) {

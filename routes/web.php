@@ -133,6 +133,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
+
+
 //});
 //Route::post('/cart/add', [CatalogController::class, 'addToCart'])->name('cart.add');
 
