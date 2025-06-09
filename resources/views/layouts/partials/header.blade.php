@@ -47,7 +47,7 @@
                         </ul>
                     </div>
                 @endif
-                <a href="{{ route('orders-stock.index') }}" class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
+                <a href="{{ route('orders.index') }}" class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
                     <i data-lucide="package" class="w-4 h-4"></i> My Purchases
                 </a>
 

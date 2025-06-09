@@ -80,7 +80,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'changePassword'])->name('profile.password');
 
-    Route::get('/orders-stock', [OrdersStockController::class, 'index'])->name('orders-stock.index');
+    Route::get('/orders-stock', [OrdersStockController::class, 'index'])->name('orders.index');
     Route::get('/orders-stock/create', [OrdersStockController::class, 'create'])->name('orders-stock.create');
     Route::post('/orders-stock', [OrdersStockController::class, 'store'])->name('orders-stock.store');
     Route::get('/orders-stock/{order}/edit', [OrdersStockController::class, 'edit'])->name('orders-stock.edit');
