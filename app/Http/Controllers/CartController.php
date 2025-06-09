@@ -107,11 +107,13 @@ class CartController extends Controller
 }
 
     private function calculateEffectivePrice($product, $quantity)
-    {
-        return ($product->discount_min_qty && $quantity >= $product->discount_min_qty)
-            ? $product->price - $product->discount
-            : $product->price;
+{
+    if ($product->discount_min_qty && $quantity >= $product->discount_min_qty && $product->discount > 0) {
+        return max($product->price - $product->discount, 0);
     }
+    return $product->price;
+}
+
 
     public function add(Request $request)
     {
@@ -388,28 +390,17 @@ class CartController extends Controller
     }
 
     public static function syncCartAfterLogin($user)
-    {
-        $sessionCart = session()->get('cart', []);
-
-        if (!empty($sessionCart)) {
-            foreach ($sessionCart as $productId => $item) {
-                Cart::updateOrCreate(
-                    ['user_id' => $user->id, 'product_id' => $productId],
-                    ['quantity' => DB::raw('quantity + ' . $item['quantity'])]
-                );
-            }
-            session()->forget('cart');
-        }
-
-        // Restaurar dados de checkout se existirem
-        if (session()->has('checkout_data')) {
-            $checkoutData = session()->get('checkout_data');
-            $user->update([
-                'nif' => $checkoutData['nif'] ?? $user->nif,
-                'address' => $checkoutData['address'] ?? $user->address
-            ]);
-            session()->forget('checkout_data');
-        }
+{
+    // Restaurar dados de checkout se existirem
+    if (session()->has('checkout_data')) {
+        $checkoutData = session()->get('checkout_data');
+        $user->update([
+            'nif' => $checkoutData['nif'] ?? $user->nif,
+            'address' => $checkoutData['address'] ?? $user->address
+        ]);
+        session()->forget('checkout_data');
     }
+}
+
 }
 ?>
