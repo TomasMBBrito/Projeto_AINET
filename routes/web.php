@@ -67,7 +67,7 @@ Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remov
 //Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 Route::post('/cart/clear-cart', [CartController::class, 'clearCart'])->name('cart.clear-cart');
 
-Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+
 Route::view('/sobre', 'pages.about')->name('about');
 Route::view('/contact', 'pages.about')->name('contact');
 Route::view('/faq', 'pages.about')->name('faq');
@@ -129,6 +129,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/admin/settings/shipping-costs/{shippingCost}/edit', [ShippingCostController::class, 'edit'])->name('admin.settings.shipping_costs.edit'); // Editar custo de envio
     Route::put('/admin/settings/shipping-costs/{shippingCost}', [ShippingCostController::class, 'update'])->name('admin.settings.shipping_costs.update'); // Atualizar custo de envio existente
     Route::delete('/admin/settings/shipping-costs/{shippingCost}', [ShippingCostController::class, 'destroy'])->name('admin.settings.shipping_costs.destroy');
+
+    Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
 
 });
 

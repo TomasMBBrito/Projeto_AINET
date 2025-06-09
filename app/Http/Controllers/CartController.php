@@ -9,7 +9,9 @@ use App\Models\ShippingCost;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Order;
-use App\Models\ItemOrder;
+use App\Models\OrderItem as ItemOrder;
+use App\Models\Operation;
+
 
 class CartController extends Controller
 {
@@ -233,7 +235,7 @@ class CartController extends Controller
 
     public function checkout(Request $request)
 {
-    /*$request->validate([
+    $request->validate([
         'nif' => 'nullable|string|max:9',
         'delivery_address' => 'required|string|max:500',
     ]);
@@ -245,17 +247,17 @@ class CartController extends Controller
 
     $user = Auth::user();
 
-    // Verificar se o utilizador é um membro do clube (member ou board)
+    //Verificar se o utilizador é um membro do clube (member ou board)
     if (!in_array($user->type, ['member', 'board'])) {
         return redirect()->route('settings.edit')->with('error', 'Apenas membros do clube podem realizar compras.');
     }
 
-    // Verificar se o utilizador está bloqueado
+    //Verificar se o utilizador está bloqueado
     if ($user->blocked) {
         return redirect()->route('cart.index')->with('error', 'A tua conta está bloqueada. Contacta o suporte.');
     }
 
-    // Calcular o total e verificar stock
+    //Calcular o total e verificar stock
     $cartItems = [];
     $totalItems = 0;
     $hasLowStock = false;
@@ -290,13 +292,22 @@ class CartController extends Controller
     $shippingCost = ShippingCost::getShippingCostForOrderTotal($totalItems);
     $total = $totalItems + $shippingCost;
 
-    // Verificar saldo do cartão virtual
+    //Verificar saldo do cartão virtual
     $card = $user->card; // Assumindo relação 'card' no modelo User
     if (!$card || $card->balance < $total) {
         return back()->with('error', 'Saldo insuficiente no cartão virtual.');
+    }else if ($card) {
+        // Verificar se o cartão está bloqueado
+        if ($card->blocked) {
+            // Se o cartão estiver bloqueado, não podemos processar o pagamento
+            return back()->with('error', 'O teu cartão virtual está bloqueado. Contacta o suporte.');
+        }
+        if ($card->balance >= $total) {
+            $card->decrement('balance', $total);
+        }
     }
 
-    // Criar o pedido
+    //Criar o pedido
     $order = Order::create([
         'member_id' => $user->id,
         'status' => 'pending', // Usamos 'pending' devido à restrição da migração
@@ -311,7 +322,7 @@ class CartController extends Controller
         'custom' => null,
     ]);
 
-    // Criar os itens do pedido
+    //Criar os itens do pedido
     foreach ($cartItems as $item) {
         ItemOrder::create([
             'order_id' => $order->id,
@@ -324,8 +335,8 @@ class CartController extends Controller
         ]);
     }
 
-    // Registrar o débito na tabela operations
-    \App\Models\Operation::create([
+    //Registrar o débito na tabela operations
+    Operation::create([
         'card_id' => $card->id,
         'type' => 'debit',
         'value' => $total,
@@ -337,21 +348,18 @@ class CartController extends Controller
         'custom' => null,
     ]);
 
-    // Deduzir do saldo do cartão virtual
-    $user->decrement('virtual_card_balance', $total);
-
-    // Limpar o carrinho
+    //Limpar o carrinho
     session()->forget('cart');
 
-    // Preparar notificação
+    //Preparar notificação
     $message = 'Compra concluída com sucesso! Pedido #' . $order->id . ' está a ser preparado.';
     if ($hasLowStock) {
         $message .= ' Aviso: Alguns produtos estão com stock insuficiente ou esgotados, o que pode atrasar a entrega.';
     }
 
-    return redirect()->route('orders.index')->with('success', $message);
+    return redirect()->route('orders-stock.index',)->with('success', $message);
 
-**NÃO ESTÁ A FUNCIONAR*/
+    //NÃO ESTÁ A FUNCIONAR*/
     }
 
 

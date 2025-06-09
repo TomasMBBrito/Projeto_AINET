@@ -75,11 +75,13 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Card::class, 'id');
     }
 
+    
+
     /**
      * Histórico de operações (através do cartão).
      */
-    // public function operations()
-    // {
-    //     return $this->hasManyThrough(Operation::class, Card::class, 'id', 'card_id');
-    // }
+    public function operations()
+    {
+        return $this->hasManyThrough(Operation::class, Card::class, 'id', 'card_id');
+    }
 }

@@ -24,8 +24,8 @@ class Card extends Model
         return $this->belongsTo(User::class, 'id'); //user_id na base de dados, ter atenção
     }
 
-    // public function operations()
-    // {
-    //     return $this->hasMany(Operation::class);
-    // }
+    public function operations()
+    {
+        return $this->hasMany(Operation::class);
+    }
 }
