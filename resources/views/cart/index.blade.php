@@ -21,7 +21,8 @@
 
         @if (empty($cartItems))
             <p class="mt-4 text-gray-600">O teu carrinho está vazio.</p>
-            <a href="{{ route('catalog.index') }}" class="mt-4 inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+            <a href="{{ route('catalog.index') }}"
+                class="mt-4 inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
                 Voltar ao Catálogo
             </a>
         @else
@@ -43,8 +44,10 @@
                                 <td class="px-4 py-2">{{ $item['name'] }}</td>
                                 <td class="px-4 py-2">
                                     @if ($item['price'] != $item['effective_price'])
-                                        <span class="text-green-700">€{{ number_format($item['effective_price'], 2) }}</span>
-                                        <span class="line-through text-gray-400 ml-2">€{{ number_format($item['price'], 2) }}</span>
+                                        <span
+                                            class="text-green-700">€{{ number_format($item['effective_price'], 2) }}</span>
+                                        <span
+                                            class="line-through text-gray-400 ml-2">€{{ number_format($item['price'], 2) }}</span>
                                     @else
                                         €{{ number_format($item['price'], 2) }}
                                     @endif
@@ -55,7 +58,8 @@
                                         <input type="hidden" name="product_id" value="{{ $item['product_id'] }}">
                                         <input type="number" name="quantity" value="{{ $item['quantity'] }}" min="0"
                                             class="w-16 p-1 border rounded mr-2">
-                                        <button type="submit" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-sm">
+                                        <button type="submit"
+                                            class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-sm">
                                             Atualizar
                                         </button>
                                     </form>
@@ -63,7 +67,8 @@
                                 <td class="px-4 py-2">€{{ number_format($item['subtotal'], 2) }}</td>
                                 <td class="px-4 py-2">
                                     @if ($item['low_stock'])
-                                        <span class="text-red-500 font-semibold">Stock baixo: {{ $item['stock'] }} (entrega pode demorar)</span>
+                                        <span class="text-red-500 font-semibold">Stock baixo: {{ $item['stock'] }} (entrega
+                                            pode demorar)</span>
                                     @else
                                         <span class="text-green-600 font-semibold">Stock: {{ $item['stock'] }}</span>
                                     @endif
@@ -72,7 +77,8 @@
                                     <form action="{{ route('cart.remove') }}" method="POST">
                                         @csrf
                                         <input type="hidden" name="product_id" value="{{ $item['product_id'] }}">
-                                        <button type="submit" class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 text-sm">
+                                        <button type="submit"
+                                            class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 text-sm">
                                             Remover
                                         </button>
                                     </form>
@@ -81,27 +87,56 @@
                         @endforeach
                     </tbody>
                 </table>
+
                 <div class="mt-4 text-right">
                     <p class="text-sm">Subtotal: €{{ number_format($total, 2) }}</p>
                     <p class="text-sm">Custo de Envio: €{{ number_format($shippingCost, 2) }}</p>
                     <p class="text-lg font-bold">Total: €{{ number_format($total + $shippingCost, 2) }}</p>
                 </div>
-                <div class="mt-4 flex justify-between items-center">
-                    <div>
-                        <a href="{{ route('catalog.index') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition mr-4">
-                            Voltar ao Catálogo
-                        </a>
-                        <form action="{{ route('cart.clear') }}" method="POST" class="inline">
-                            @csrf
-                            <button type="submit" class="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800 transition">
-                                Limpar Carrinho
-                            </button>
-                        </form>
-                    </div>
+
+                <div class="mt-6 bg-white p-4 rounded-lg shadow">
+                    <h2 class="text-xl font-semibold mb-4">Informações de Envio</h2>
                     <form action="{{ route('cart.checkout') }}" method="POST">
                         @csrf
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
-                            Finalizar Compra
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="nif" class="block text-gray-700 font-medium mb-1">NIF</label>
+                                <input type="text" id="nif" name="nif" value="{{ old('nif', $nif ?? '') }}"
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2" maxlength="9">
+                                @error('nif')
+                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div>
+                                <label for="delivery_address" class="block text-gray-700 font-medium mb-1">Morada de
+                                    Entrega</label>
+                                <textarea id="delivery_address" name="delivery_address" rows="2"
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2" required>{{ old('delivery_address', $delivery_address ?? '') }}</textarea>
+                                @error('delivery_address')
+                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="mt-4 text-right">
+                            <button type="submit"
+                                class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                                Confirmar Compra
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="mt-4 flex space-x-4">
+                    <a href="{{ route('catalog.index') }}"
+                        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                        Voltar ao Catálogo
+                    </a>
+
+                    <form action="{{ route('cart.clear-cart') }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit"
+                            class="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800 transition">
+                            Limpar Carrinho
                         </button>
                     </form>
                 </div>

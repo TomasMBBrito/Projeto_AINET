@@ -26,8 +26,8 @@
             Guardar
         </button>
 
-        <a href="{{ route('admin.settings.shipping_costs.index') }}" class="inline-block mt-4 text-sm text-gray-600 hover:underline">
-            ← Voltar à lista
+        <a href="{{ route('admin.settings.shipping_costs.index') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+            Voltar à lista
         </a>
 
     </form>

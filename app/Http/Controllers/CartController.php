@@ -8,43 +8,45 @@ use App\Models\Cart;
 use App\Models\ShippingCost;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\Order;
+use App\Models\ItemOrder;
 
 class CartController extends Controller
 {
     public function index()
-    {
-        $cartItems = [];
-        $total = 0;
-        $shippingCost = ShippingCost::first()->cost ?? 0;
+{
+    $cartItems = [];
+    $total = 0;
+    $shippingCost = 0;
 
-        $cart = session()->get('cart', []);
+    $sessionCart = session()->get('cart', []);
+    if (!empty($sessionCart)) {
+        $productIds = array_keys($sessionCart);
+        $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
 
-        $sessionCart = session()->get('cart', []);
-        if (!empty($sessionCart)) {
-            $productIds = array_keys($sessionCart);
-            $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
-            foreach ($sessionCart as $productId => $item) {
-                if (isset($products[$productId])) {
-                    $cartItems[$productId] = [
-                        'product_id' => $productId,
-                        'name' => $products[$productId]->name,
-                        'price' => $products[$productId]->price,
-                        'effective_price' => $products[$productId]->discount_min_qty
-                            && $item['quantity'] >= $products[$productId]->discount_min_qty
-                            ? $products[$productId]->price - $products[$productId]->discount
-                            : $products[$productId]->price,
-                        'quantity' => $item['quantity'],
-                        'subtotal' => ($products[$productId]->discount_min_qty
-                            && $item['quantity'] >= $products[$productId]->discount_min_qty
-                            ? $products[$productId]->price - $products[$productId]->discount
-                            : $products[$productId]->price) * $item['quantity'],
-                        'stock' => $products[$productId]->stock,
-                        'low_stock' => $item['quantity'] > $products[$productId]->stock,
-                    ];
-                    $total += $cartItems[$productId]['subtotal'];
-                }
+        foreach ($sessionCart as $productId => $item) {
+            if (isset($products[$productId])) {
+                $effectivePrice = $this->calculateEffectivePrice($products[$productId], $item['quantity']);
+
+                $cartItems[$productId] = [
+                    'product_id' => $productId,
+                    'name' => $products[$productId]->name,
+                    'price' => $products[$productId]->price,
+                    'effective_price' => $effectivePrice,
+                    'quantity' => $item['quantity'],
+                    'subtotal' => $effectivePrice * $item['quantity'],
+                    'stock' => $products[$productId]->stock,
+                    'low_stock' => $item['quantity'] > $products[$productId]->stock,
+                ];
+                $total += $cartItems[$productId]['subtotal'];
             }
         }
+
+        // Calcular custo de envio baseado no valor total
+        $shippingCost = ShippingCost::getShippingCostForOrderTotal($total);
+    }
+
+        //
         // if (Auth::check()) {
         //     $dbCartItems = Cart::where('user_id', Auth::id())->with('product')->get();
         //     foreach ($dbCartItems as $item) {
@@ -94,7 +96,19 @@ class CartController extends Controller
         //         }
         //     }
         // }
-        return view('cart.index', compact('cartItems', 'total', 'shippingCost'));
+
+    // Obter NIF e morada do utilizador se estiver autenticado
+    $nif = Auth::check() ? Auth::user()->nif : '';
+    $delivery_address = Auth::check() ? Auth::user()->default_delivery_address : '';
+
+    return view('cart.index', compact('cartItems', 'total', 'shippingCost', 'nif', 'delivery_address'));
+}
+
+    private function calculateEffectivePrice($product, $quantity)
+    {
+        return ($product->discount_min_qty && $quantity >= $product->discount_min_qty)
+            ? $product->price - $product->discount
+            : $product->price;
     }
 
     public function add(Request $request)
@@ -108,6 +122,7 @@ class CartController extends Controller
         ]);
 
         $cart = session()->get('cart', []);
+        $currentQuantity = $cart[$productId]['quantity'] ?? 0;
         $cart[$productId] = [
             'product_id' => $productId,
             'quantity' => ($cart[$productId]['quantity'] ?? 0) + $quantity,
@@ -193,7 +208,7 @@ class CartController extends Controller
         ]);
 
         $cart = session()->get('cart', []);
-        if ( isset($cart[$productId]) ) {
+        if (isset($cart[$productId])) {
             unset($cart[$productId]);
             session()->put('cart', $cart);
         }
@@ -209,32 +224,159 @@ class CartController extends Controller
         return redirect()->route('cart.index')->with('success', 'Produto removido do carrinho!');
     }
 
-    public function clear()
-    {
-        // if (Auth::check()) {
-        //     Cart::where('user_id', Auth::id())->delete();
-        // }
-        session()->forget('cart');
+    public function clearCart(Request $request)
+{
+    session()->forget('cart');
 
-        return redirect()->route('cart.index')->with('success', 'Carrinho limpo!');
-    }
+    return redirect()->route('cart.index')->with('success', 'Carrinho limpo com sucesso!');
+}
 
     public function checkout(Request $request)
+{
+    /*$request->validate([
+        'nif' => 'nullable|string|max:9',
+        'delivery_address' => 'required|string|max:500',
+    ]);
+
+    if (!Auth::check()) {
+        session()->put('checkout_data', $request->only(['nif', 'delivery_address']));
+        return redirect()->route('login')->with('error', 'Por favor, faça login para completar a compra.');
+    }
+
+    $user = Auth::user();
+
+    // Verificar se o utilizador é um membro do clube (member ou board)
+    if (!in_array($user->type, ['member', 'board'])) {
+        return redirect()->route('settings.edit')->with('error', 'Apenas membros do clube podem realizar compras.');
+    }
+
+    // Verificar se o utilizador está bloqueado
+    if ($user->blocked) {
+        return redirect()->route('cart.index')->with('error', 'A tua conta está bloqueada. Contacta o suporte.');
+    }
+
+    // Calcular o total e verificar stock
+    $cartItems = [];
+    $totalItems = 0;
+    $hasLowStock = false;
+    $sessionCart = session()->get('cart', []);
+
+    if (empty($sessionCart)) {
+        return redirect()->route('cart.index')->with('error', 'O carrinho está vazio.');
+    }
+
+    $productIds = array_keys($sessionCart);
+    $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+
+    foreach ($sessionCart as $productId => $item) {
+        if (isset($products[$productId])) {
+            $effectivePrice = $this->calculateEffectivePrice($products[$productId], $item['quantity']);
+            $discount = $products[$productId]->price - $effectivePrice;
+            $cartItems[$productId] = [
+                'product_id' => $productId,
+                'quantity' => $item['quantity'],
+                'unit_price' => $effectivePrice,
+                'discount' => $discount,
+                'subtotal' => $effectivePrice * $item['quantity'],
+                'name' => $products[$productId]->name, // Para notificação
+            ];
+            $totalItems += $cartItems[$productId]['subtotal'];
+            if ($products[$productId]->stock <= 0 || $item['quantity'] > $products[$productId]->stock) {
+                $hasLowStock = true;
+            }
+        }
+    }
+
+    $shippingCost = ShippingCost::getShippingCostForOrderTotal($totalItems);
+    $total = $totalItems + $shippingCost;
+
+    // Verificar saldo do cartão virtual
+    $card = $user->card; // Assumindo relação 'card' no modelo User
+    if (!$card || $card->balance < $total) {
+        return back()->with('error', 'Saldo insuficiente no cartão virtual.');
+    }
+
+    // Criar o pedido
+    $order = Order::create([
+        'member_id' => $user->id,
+        'status' => 'pending', // Usamos 'pending' devido à restrição da migração
+        'date' => now()->toDateString(),
+        'total_items' => $totalItems,
+        'shipping_cost' => $shippingCost,
+        'total' => $total,
+        'nif' => $request->input('nif'),
+        'delivery_address' => $request->input('delivery_address'),
+        'pdf_receipt' => null,
+        'cancel_reason' => null,
+        'custom' => null,
+    ]);
+
+    // Criar os itens do pedido
+    foreach ($cartItems as $item) {
+        ItemOrder::create([
+            'order_id' => $order->id,
+            'product_id' => $item['product_id'],
+            'quantity' => $item['quantity'],
+            'unit_price' => $item['unit_price'],
+            'discount' => $item['discount'],
+            'subtotal' => $item['subtotal'],
+            'custom' => null,
+        ]);
+    }
+
+    // Registrar o débito na tabela operations
+    \App\Models\Operation::create([
+        'card_id' => $card->id,
+        'type' => 'debit',
+        'value' => $total,
+        'date' => now()->toDateString(),
+        'debit_type' => 'order',
+        'order_id' => $order->id,
+        'payment_type' => $user->default_payment_type,
+        'payment_reference' => $user->default_payment_reference,
+        'custom' => null,
+    ]);
+
+    // Deduzir do saldo do cartão virtual
+    $user->decrement('virtual_card_balance', $total);
+
+    // Limpar o carrinho
+    session()->forget('cart');
+
+    // Preparar notificação
+    $message = 'Compra concluída com sucesso! Pedido #' . $order->id . ' está a ser preparado.';
+    if ($hasLowStock) {
+        $message .= ' Aviso: Alguns produtos estão com stock insuficiente ou esgotados, o que pode atrasar a entrega.';
+    }
+
+    return redirect()->route('orders.index')->with('success', $message);
+
+**NÃO ESTÁ A FUNCIONAR*/
+    }
+
+
+    private function calculateTotal()
     {
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Por favor, faça login ou registe-se para completar a compra.');
+        $cartItems = [];
+        $total = 0;
+        $sessionCart = session()->get('cart', []);
+
+        if (!empty($sessionCart)) {
+            $productIds = array_keys($sessionCart);
+            $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+
+            foreach ($sessionCart as $productId => $item) {
+                if (isset($products[$productId])) {
+                    $effectivePrice = $this->calculateEffectivePrice($products[$productId], $item['quantity']);
+                    $total += $effectivePrice * $item['quantity'];
+                }
+            }
+
+            $shippingCost = ShippingCost::getShippingCostForOrderTotal($total);
+            $total += $shippingCost;
         }
 
-        if (!Auth::user()->has_paid_membership) {
-            return redirect()->route('settings.edit')->with('error', 'Por favor, pague a taxa de adesão para completar a compra.');
-        }
-
-        if (Auth::check()) {
-            Cart::where('user_id', Auth::id())->delete();
-        }
-        session()->forget('cart');
-
-        return redirect()->route('cart.index')->with('success', 'Compra concluída com sucesso!');
+        return $total;
     }
 
     public static function syncCartAfterLogin($user)
@@ -249,6 +391,16 @@ class CartController extends Controller
                 );
             }
             session()->forget('cart');
+        }
+
+        // Restaurar dados de checkout se existirem
+        if (session()->has('checkout_data')) {
+            $checkoutData = session()->get('checkout_data');
+            $user->update([
+                'nif' => $checkoutData['nif'] ?? $user->nif,
+                'address' => $checkoutData['address'] ?? $user->address
+            ]);
+            session()->forget('checkout_data');
         }
     }
 }

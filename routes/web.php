@@ -15,7 +15,7 @@ use App\Http\Controllers\{
     ProductController,
     BusinessSettingsController,
     ShippingCostController,
-    CartController
+    CartController,
 };
 
 
@@ -64,7 +64,9 @@ Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
-Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+//Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+Route::post('/cart/clear-cart', [CartController::class, 'clearCart'])->name('cart.clear-cart');
+
 Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
 Route::view('/sobre', 'pages.about')->name('about');
 Route::view('/contact', 'pages.about')->name('contact');
@@ -128,11 +130,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/admin/settings/shipping-costs/{shippingCost}', [ShippingCostController::class, 'update'])->name('admin.settings.shipping_costs.update'); // Atualizar custo de envio existente
     Route::delete('/admin/settings/shipping-costs/{shippingCost}', [ShippingCostController::class, 'destroy'])->name('admin.settings.shipping_costs.destroy');
 
-
 });
-
-
-
 
 
 //});
