@@ -78,25 +78,22 @@
             <p class="text-sm text-gray-600 mt-2">{{ $product->description }}</p>
 
             {{-- Controles --}}
-            <div class="mt-4 flex items-center justify-between">
-                @if ($product->stock <= 0)
-                    <span class="text-xs text-red-500 font-semibold">Out of stock</span>
-                    <button class="bg-gray-400 text-white px-3 py-1 rounded text-sm cursor-not-allowed" disabled>
-                        Add to cart
-                    </button>
-                @else
-                    <span class="text-xs text-green-600 font-semibold">In stock</span>
-                    <form action="{{ route('cart.add') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="product_id" value="{{ $product->id }}">
-                        <input type="number" name="quantity" value="1" min="1" max="{{ $product->stock }}"
-                            class="w-16 p-1 border rounded mr-2">
-                        <button type="submit" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm">
-                            Add to cart
-                        </button>
-                    </form>
-                @endif
-            </div>
+<div class="mt-4 flex items-center justify-between">
+    <span class="text-xs {{ $product->stock <= 0 ? 'text-red-500' : 'text-green-600' }} font-semibold">
+        {{ $product->stock <= 0 ? 'Out of stock' : 'In stock' }}
+    </span>
+
+    <form action="{{ route('cart.add') }}" method="POST">
+        @csrf
+        <input type="hidden" name="product_id" value="{{ $product->id }}">
+        <input type="number" name="quantity" value="1" min="1"
+            class="w-16 p-1 border rounded mr-2" />
+        <button type="submit" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm">
+            Add to cart
+        </button>
+    </form>
+</div>
+
         </div>
         @endforeach
     </div>
