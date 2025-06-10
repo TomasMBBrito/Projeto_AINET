@@ -16,6 +16,8 @@ use App\Http\Controllers\{
     BusinessSettingsController,
     ShippingCostController,
     CartController,
+    CardController,
+    MembershipFeeController
 };
 
 
@@ -123,6 +125,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('membership_fee', [BusinessSettingsController::class, 'edit'])->name('settings.edit');
     Route::post('/membership_fee', [BusinessSettingsController::class, 'update'])->name('settings.update');
 
+    // Cartão Virtual
+    Route::get('/card/create', [CardController::class, 'showCreate'])->name('card.create');
+    Route::post('/card/create', [CardController::class, 'storeCreate']);
+    Route::get('/card/topup', [CardController::class, 'showTopup'])->name('card.topup');
+    Route::post('/card/topup', [CardController::class, 'processTopup']);
+
+    // Quota de membro
+    Route::get('/membership/pay', [MembershipFeeController::class, 'showPayMembership'])->name('membership.pay');
+    Route::post('/membership/process', [MembershipFeeController::class, 'processMembershipFee'])->name('membership.process');
+
     //Custos de envio
     Route::get('/admin/settings/shipping-costs', [ShippingCostController::class, 'index'])->name('admin.settings.shipping_costs.index'); // Lista de custos de envio
     Route::get('/admin/settings/shipping-costs/create', [ShippingCostController::class, 'create'])->name('admin.settings.shipping_costs.create'); // Criar novo custo de envio
@@ -132,6 +144,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/admin/settings/shipping-costs/{shippingCost}', [ShippingCostController::class, 'destroy'])->name('admin.settings.shipping_costs.destroy');
 
     Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+
+    // Página de confirmação da compra (checkout)
+    Route::get('/cart/confirm', [CartController::class, 'showConfirm'])->name('cart.confirm');
+
+    // Confirmar e finalizar compra
+    Route::post('/cart/confirm', [CartController::class, 'finalize'])->name('cart.process');
 
 });
 
