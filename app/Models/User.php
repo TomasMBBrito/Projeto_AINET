@@ -72,10 +72,13 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function card()
     {
-        return $this->hasOne(Card::class, 'id');
+        return $this->hasMany(Card::class, 'id');
     }
 
-    
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'member_id');
+    }
 
     /**
      * Histórico de operações (através do cartão).

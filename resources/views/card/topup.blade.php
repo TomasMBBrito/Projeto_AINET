@@ -1,34 +1,32 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-xl mx-auto mt-10 p-6 bg-white rounded shadow">
-    <h2 class="text-2xl font-bold mb-6">Adicionar Saldo ao Cartão</h2>
+<div class="container mx-auto px-4 py-8 max-w-xl">
+    <h1 class="text-2xl font-bold text-green-700 mb-6">Top Up Virtual Card</h1>
 
-    @if (session('success'))
-        <div class="bg-green-100 text-green-800 p-4 rounded mb-4">
-            {{ session('success') }}
-        </div>
-    @endif
+    <div class="bg-white shadow rounded p-6 mb-6">
+        <p class="text-gray-800 font-semibold mb-1">Card Number:</p>
+        <p class="text-gray-600 mb-4">*** {{ substr($card->card_number, -3) }}</p>
 
-    @if (session('error'))
-        <div class="bg-red-100 text-red-800 p-4 rounded mb-4">
-            {{ session('error') }}
-        </div>
-    @endif
+        <p class="text-gray-800 font-semibold mb-1">Actual Balance:</p>
+        <p class="text-gray-600 mb-4">{{ $card->balance }}</p>
 
-    <p class="text-lg mb-4">Saldo atual: <strong>{{ number_format($balance, 2) }} €</strong></p>
+        <!-- <p class="text-gray-800 font-semibold mb-1">Actual Balance:</p>
+        <p class="text-gray-600">{{ $card->name }}</p> -->
+    </div>
 
-    <form action="{{ route('card.topup') }}" method="POST">
+    <form action="{{ route('card.topup.store', $card->id) }}" method="POST" class="bg-white shadow rounded p-6">
         @csrf
         <div class="mb-4">
-            <label for="amount" class="block text-sm font-medium mb-1">Valor a adicionar (€)</label>
-            <input type="number" name="amount" id="amount" step="0.01" min="1" required
-                   class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <label for="amount" class="block text-gray-700 font-medium mb-2">Amount to Add (€)</label>
+            <input type="number" name="amount" id="amount" min="1" step="0.01"
+                class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                required>
         </div>
 
         <button type="submit"
-                class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
-            Adicionar Saldo
+            class="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition font-semibold">
+            Confirm Top Up
         </button>
     </form>
 </div>

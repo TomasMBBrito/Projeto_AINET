@@ -126,10 +126,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/membership_fee', [BusinessSettingsController::class, 'update'])->name('settings.update');
 
     // Cartão Virtual
+    
+    Route::get('/cards', [CardController::class, 'index'])->name('cards.index');
     Route::get('/card/create', [CardController::class, 'showCreate'])->name('card.create');
     Route::post('/card/create', [CardController::class, 'storeCreate']);
-    Route::get('/card/topup', [CardController::class, 'showTopup'])->name('card.topup');
-    Route::post('/card/topup', [CardController::class, 'processTopup']);
+    Route::get('/card/{card}/topup', [CardController::class, 'topup'])->name('card.topup');
+    Route::post('/card/{card}/topup', [CardController::class, 'storeTopup'])->name('card.topup.store');
+
 
     // Quota de membro
     Route::get('/membership/pay', [MembershipFeeController::class, 'showPayMembership'])->name('membership.pay');
