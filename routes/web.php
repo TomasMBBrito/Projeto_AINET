@@ -16,6 +16,8 @@ use App\Http\Controllers\{
     BusinessSettingsController,
     ShippingCostController,
     CartController,
+    CardController,
+    MembershipFeeController
 };
 
 
@@ -61,13 +63,14 @@ Route::middleware('auth')->group(function () {
 // Rotas públicas (acessíveis a todos)
 Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+//Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/add/', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 //Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 Route::post('/cart/clear-cart', [CartController::class, 'clearCart'])->name('cart.clear-cart');
 
-Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+
 Route::view('/sobre', 'pages.about')->name('about');
 Route::view('/contact', 'pages.about')->name('contact');
 Route::view('/faq', 'pages.about')->name('faq');
@@ -122,6 +125,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('membership_fee', [BusinessSettingsController::class, 'edit'])->name('settings.edit');
     Route::post('/membership_fee', [BusinessSettingsController::class, 'update'])->name('settings.update');
 
+    // Cartão Virtual
+    
+    Route::get('/cards', [CardController::class, 'index'])->name('cards.index');
+    Route::get('/card/create', [CardController::class, 'showCreate'])->name('card.create');
+    Route::post('/card/create', [CardController::class, 'storeCreate']);
+    Route::get('/card/{card}/topup', [CardController::class, 'topup'])->name('card.topup');
+    Route::post('/card/{card}/topup', [CardController::class, 'storeTopup'])->name('card.topup.store');
+
+
+    // Quota de membro
+    Route::get('/membership/pay', [MembershipFeeController::class, 'showPayMembership'])->name('membership.pay');
+    Route::post('/membership/process', [MembershipFeeController::class, 'processMembershipFee'])->name('membership.process');
+
     //Custos de envio
     Route::get('/admin/settings/shipping-costs', [ShippingCostController::class, 'index'])->name('admin.settings.shipping_costs.index'); // Lista de custos de envio
     Route::get('/admin/settings/shipping-costs/create', [ShippingCostController::class, 'create'])->name('admin.settings.shipping_costs.create'); // Criar novo custo de envio
@@ -129,6 +145,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/admin/settings/shipping-costs/{shippingCost}/edit', [ShippingCostController::class, 'edit'])->name('admin.settings.shipping_costs.edit'); // Editar custo de envio
     Route::put('/admin/settings/shipping-costs/{shippingCost}', [ShippingCostController::class, 'update'])->name('admin.settings.shipping_costs.update'); // Atualizar custo de envio existente
     Route::delete('/admin/settings/shipping-costs/{shippingCost}', [ShippingCostController::class, 'destroy'])->name('admin.settings.shipping_costs.destroy');
+
+    Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+
+    // Página de confirmação da compra (checkout)
+    Route::get('/cart/confirm', [CartController::class, 'showConfirm'])->name('cart.confirm');
+
+    // Confirmar e finalizar compra
+    Route::post('/cart/confirm', [CartController::class, 'finalize'])->name('cart.process');
 
 });
 

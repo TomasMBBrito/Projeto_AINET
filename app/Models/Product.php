@@ -12,7 +12,7 @@ class Product extends Model
 
     protected $fillable = [
         'category_id', 'name', 'price', 'stock', 'description', 'photo',
-        'discount_min_qty', 'stock_lower_limit', 'stock_upper_limit', 'custom'
+        'discount_min_qty', 'discount', 'stock_lower_limit', 'stock_upper_limit', 'custom'
     ];
 
     // Relação com a tabela categories

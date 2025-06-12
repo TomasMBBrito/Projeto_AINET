@@ -51,6 +51,10 @@
                     <i data-lucide="package" class="w-4 h-4"></i> My Purchases
                 </a>
 
+                <a href="{{ route('cards.index') }}" class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
+                    <i data-lucide="credit-card" class="w-4 h-4"></i> My Cards
+                </a>
+
                 <a href="{{ route('profile.show') }}" class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
                     <i data-lucide="user" class="w-4 h-4"></i> Profile
                 </a>
