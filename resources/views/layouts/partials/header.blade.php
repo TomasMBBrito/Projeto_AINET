@@ -46,7 +46,7 @@
                                     class="block px-4 py-2 text-white hover:bg-green-700 transition">Products</a>
                             </li>
                             <li>
-                                <a href="{{ route('supply-orders.index') }}"
+                                <a href="{{ route('orders.index') }}"
                                     class="block px-4 py-2 text-white hover:bg-green-700 transition">Orders</a>
                             </li>
                             <li>
@@ -60,10 +60,19 @@
                         </ul>
                     </div>
                 @endif
-                <a href="{{ route('orders.index') }}"
-                    class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
-                    <i data-lucide="package" class="w-4 h-4"></i> My Purchases
-                </a>
+                @if (Auth::user()->type === 'employee')
+                    <a href="{{ route('orders.index') }}"
+                        class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
+                        <i data-lucide="clipboard-list" class="w-4 h-4"></i> Orders
+                    </a>
+                @endif
+
+                @if (Auth::user()->type !== 'employee')
+                    <a href="{{ route('purchases.index') }}"
+                        class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
+                        <i data-lucide="shopping-cart" class="w-4 h-4"></i> My Purchases
+                    </a>
+                @endif
 
                 <a href="{{ route('cards.index') }}"
                     class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">

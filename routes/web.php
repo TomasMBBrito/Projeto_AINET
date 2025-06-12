@@ -17,7 +17,8 @@ use App\Http\Controllers\{
     ShippingCostController,
     CartController,
     CardController,
-    MembershipFeeController
+    MembershipFeeController,
+    PurchaseController
 };
 
 
@@ -93,7 +94,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Submeter a razão de cancelamento
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])
         ->name('orders.cancel');
-    
+
     Route::get('/orders/{order}/invoice', [OrderController::class, 'generateInvoice'])
     ->name('orders.invoice');
 
@@ -179,11 +180,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/supply-orders/{supplyOrder}/complete', [SupplyOrderController::class, 'complete'])->name('supply-orders.complete');
     Route::delete('/supply-orders/{supplyOrder}', [SupplyOrderController::class, 'destroy'])->name('supply-orders.destroy');
 
-
+    // Purchase routes
+    Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
 
 });
-
-
 
 
 //});
