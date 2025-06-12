@@ -3,82 +3,60 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-//use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Order extends Model
 {
-    //use SoftDeletes;
-
     protected $fillable = [
         'member_id',
         'status',
         'date',
         'total_items',
-        'shipping_cost',
+        'shipping_costs',
         'total',
         'nif',
         'delivery_address',
         'pdf_receipt',
-        'cancel_reason',
+        'cancel_reason'
     ];
 
     protected $casts = [
-        'total_items' => 'decimal:2',
-        'shipping_costs' => 'decimal:2',
-        'total' => 'decimal:2',
         'date' => 'date',
     ];
 
-    // ======================
-    // === RELAÇÕES ========
-    // ======================
-
-    public function member()
+    public function member(): BelongsTo
     {
         return $this->belongsTo(User::class, 'member_id');
     }
 
-    public function items()
+       public function items(): BelongsToMany
+   {
+       return $this->belongsToMany(Product::class, 'items_orders')
+           ->using(OrderItem::class)
+           ->withPivot([
+               'quantity',
+               'unit_price',
+               'discount',
+               'subtotal'
+           ])
+           ->as('order_item')
+           ->withTimestamps(false);
+   }
+
+
+    public function scopePending($query)
     {
-        return $this->hasMany(OrderItem::class);
+        return $query->where('status', 'pending');
     }
 
-    public function operations()
+    public function scopeCompleted($query)
     {
-        return $this->hasOne(Operation::class, 'order_id');
+        return $query->where('status', 'completed');
     }
 
-    // ======================
-    // === MÉTODOS ÚTEIS ===
-    // ======================
-
-    public function isPending()
+    public function scopeCanceled($query)
     {
-        return $this->status === 'pending';
+        return $query->where('status', 'canceled');
     }
-
-    public function isCompleted()
-    {
-        return $this->status === 'completed';
-    }
-
-    public function isCanceled()
-    {
-        return $this->status === 'canceled';
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function product()
-    {
-        return $this->belongsTo(Product::class);
-    }
-
-    // public function hasReceipt()
-    // {
-    //     return !is_null($this->pdf_receipt);
-    // }
 }

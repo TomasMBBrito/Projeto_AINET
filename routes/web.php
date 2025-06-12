@@ -3,14 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\{
     AuthController,
     ProfileController,
     UserManagementController,
     CatalogController,
     HomeController,
-    OrdersStockController,
+    OrderController,
+    SupplyOrderController,
     CategoryController,
     ProductController,
     BusinessSettingsController,
@@ -83,12 +83,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'changePassword'])->name('profile.password');
 
-    Route::get('/orders-stock', [OrdersStockController::class, 'index'])->name('orders.index');
-    Route::get('/orders-stock/create', [OrdersStockController::class, 'create'])->name('orders-stock.create');
-    Route::post('/orders-stock', [OrdersStockController::class, 'store'])->name('orders-stock.store');
-    Route::get('/orders-stock/{order}/edit', [OrdersStockController::class, 'edit'])->name('orders-stock.edit');
-    Route::put('/orders-stock/{order}', [OrdersStockController::class, 'update'])->name('orders-stock.update');
-    Route::delete('/orders-stock/{order}', [OrdersStockController::class, 'destroy'])->name('orders-stock.destroy');
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders/{order}/edit', [OrderController::class, 'edit'])->name('orders.edit');
+    Route::put('/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+    Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
 
     //Route::get('/test-gate', [UserManagementController::class, 'testGate']);
 
@@ -126,7 +126,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/membership_fee', [BusinessSettingsController::class, 'update'])->name('settings.update');
 
     // Cartão Virtual
-    
+
     Route::get('/cards', [CardController::class, 'index'])->name('cards.index');
     Route::get('/card/create', [CardController::class, 'showCreate'])->name('card.create');
     Route::post('/card/create', [CardController::class, 'storeCreate']);
@@ -153,6 +153,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Confirmar e finalizar compra
     Route::post('/cart/confirm', [CartController::class, 'finalize'])->name('cart.process');
+
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::patch('/orders/{order}/complete', [OrderController::class, 'complete'])->name('orders.complete')
+         ->middleware('can:complete,order');
+    Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel')
+         ->middleware('can:cancel,order');
+
+    // Supply Orders routes
+    Route::get('/supply-orders', [SupplyOrderController::class, 'index'])->name('supply-orders.index');
+    Route::post('/supply-orders', [SupplyOrderController::class, 'store'])->name('supply-orders.store');
+    Route::patch('/supply-orders/{supplyOrder}/complete', [SupplyOrderController::class, 'complete'])->name('supply-orders.complete');
+    Route::delete('/supply-orders/{supplyOrder}', [SupplyOrderController::class, 'destroy'])->name('supply-orders.destroy');
+
+
 
 });
 
