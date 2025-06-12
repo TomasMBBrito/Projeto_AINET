@@ -84,6 +84,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/profile/password', [ProfileController::class, 'changePassword'])->name('profile.password');
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/complete', [OrderController::class, 'complete'])->name('orders.complete');
+    // Mostrar o formulário de cancelamento
+    Route::get('/orders/{order}/cancel', [OrderController::class, 'showCancelForm'])
+        ->name('orders.cancel.form');
+
+    // Submeter a razão de cancelamento
+    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])
+        ->name('orders.cancel');
+    
+    Route::get('/orders/{order}/invoice', [OrderController::class, 'generateInvoice'])
+    ->name('orders.invoice');
+
     Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders/{order}/edit', [OrderController::class, 'edit'])->name('orders.edit');

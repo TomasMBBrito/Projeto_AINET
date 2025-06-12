@@ -39,7 +39,7 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items_Cost</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -49,7 +49,7 @@
                 @forelse($orders as $order)
                 <tr>
                     <td class="px-6 py-4 whitespace-nowrap">{{ $order->id }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ $order->member->name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ optional($order->member)->name ?? 'Membro apagado' }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">{{ $order->date->format('d/m/Y') }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">{{ $order->total_items }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">€{{ number_format($order->total, 2) }}</td>
@@ -64,17 +64,17 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <a href="{{ route('orders.show', $order->id) }}" class="text-blue-600 hover:text-blue-900 mr-2">View</a>
 
-                        @can('complete', $order)
+                        <!-- @can('complete', $order)
                         <form action="{{ route('orders.complete', $order->id) }}" method="POST" class="inline">
                             @csrf
                             @method('PATCH')
                             <button type="submit" class="text-green-600 hover:text-green-900">Complete</button>
                         </form>
-                        @endcan
+                        @endcan -->
 
-                        @can('cancel', $order)
+                        <!-- @can('cancel', $order)
                         <button onclick="openCancelModal({{ $order->id }})" class="text-red-600 hover:text-red-900 ml-2">Cancel</button>
-                        @endcan
+                        @endcan -->
                     </td>
                 </tr>
                 @empty
@@ -88,11 +88,11 @@
 
     <!-- Pagination -->
     <div class="mt-4">
-        {{ $orders->links() }}
-    </div>
+    {{ $orders->appends(request()->query())->links() }}
+</div>
 </div>
 
-<!-- Cancel Order Modal -->
+<!-- Cancel Order Modal
 <div id="cancelModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
     <div class="bg-white rounded-lg p-6 max-w-md w-full">
         <h3 class="text-lg font-medium mb-4">Cancel Order</h3>
@@ -121,5 +121,5 @@
     function closeCancelModal() {
         document.getElementById('cancelModal').classList.add('hidden');
     }
-</script>
+</script> -->
 @endsection

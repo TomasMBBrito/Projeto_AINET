@@ -69,7 +69,7 @@ class SupplyOrderController extends Controller
 
     public function destroy(SupplyOrder $supplyOrder)
     {
-        $supplyOrder->delete();
+        $supplyOrder->forceDelete();
         return back()->with('success', 'Supply order deleted');
     }
 }

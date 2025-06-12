@@ -9,17 +9,17 @@
     <!-- Status Filter -->
     <div class="mb-6 flex space-x-2">
         <a href="{{ route('supply-orders.index') }}"
-           class="{{ !request('status') ? 'bg-green-600 text-white' : 'bg-gray-200' }} px-4 py-2 rounded">
+           class="{{ !request('status') ? 'bg-green-600 text-white' : 'bg-gray-200' }} hover:bg-green-500 hover:text-white px-4 py-2 rounded">
             All Orders
         </a>
         @foreach(['requested', 'completed'] as $status)
             <a href="{{ route('supply-orders.index', ['status' => $status]) }}"
-               class="{{ request('status') === $status ? 'bg-green-600 text-white' : 'bg-gray-200' }} px-4 py-2 rounded">
+               class="{{ request('status') === $status ? 'bg-green-600 text-white' : 'bg-gray-200' }} hover:bg-green-500 hover:text-white px-4 py-2 rounded">
                 {{ ucfirst($status) }}
             </a>
         @endforeach
         <a href="{{ route('supply-orders.index', ['low_stock' => 1]) }}"
-           class="{{ request('low_stock') ? 'bg-red-600 text-white' : 'bg-gray-200' }} px-4 py-2 rounded">
+           class="{{ request('low_stock') ? 'bg-red-600 text-white' : 'bg-gray-200' }} hover:bg-red-500 hover:text-white px-4 py-2 rounded">
             Low Stock Products
         </a>
     </div>

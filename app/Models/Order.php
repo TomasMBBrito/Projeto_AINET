@@ -30,19 +30,18 @@ class Order extends Model
         return $this->belongsTo(User::class, 'member_id');
     }
 
-       public function items(): BelongsToMany
-   {
-       return $this->belongsToMany(Product::class, 'items_orders')
-           ->using(OrderItem::class)
-           ->withPivot([
-               'quantity',
-               'unit_price',
-               'discount',
-               'subtotal'
-           ])
-           ->as('order_item')
-           ->withTimestamps(false);
-   }
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'items_orders')
+        ->withPivot(['quantity', 'unit_price', 'discount', 'subtotal'])
+        ->as('order_item');;
+    }
+
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
 
 
     public function scopePending($query)

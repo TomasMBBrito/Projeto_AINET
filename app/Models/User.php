@@ -70,9 +70,9 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Relação com o cartão virtual.
      */
-    public function card()
+    public function cards()
     {
-        return $this->hasMany(Card::class, 'id');
+        return $this->hasMany(Card::class);
     }
 
     public function orders()

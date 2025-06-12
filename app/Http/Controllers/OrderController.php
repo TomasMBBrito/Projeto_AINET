@@ -8,6 +8,10 @@ use App\Models\Operation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\CompleteOrderRequest;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Mail\OrderCompletedMail;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -15,8 +19,7 @@ class OrderController extends Controller
     {
         $user = Auth::user();
 
-        $query = Order::with(['items.product', 'member'])
-            ->orderBy('date', 'desc');
+        $query = Order::with(['products', 'member']);
 
         if ($user->type === 'member') {
             $query->where('member_id', $user->id);
@@ -27,7 +30,7 @@ class OrderController extends Controller
             });
         }
 
-        $orders = $query->paginate(10);
+        $orders = $query->paginate(20); // Paginação só no fim
 
         return view('orders.index', [
             'orders' => $orders,
@@ -35,28 +38,70 @@ class OrderController extends Controller
         ]);
     }
 
+
+    public function show(Order $order)
+    {
+        // Carrega os produtos da encomenda
+        $order->load('products');
+
+        return view('orders.show', compact('order'));
+    }
+
     public function complete(Order $order)
     {
-        DB::transaction(function () use ($order) {
-            // Verify all products have enough stock
-            foreach ($order->items as $item) {
-                if ($item->product->stock < $item->quantity) {
-                    return back()->with('error', "Product {$item->product->name} doesn't have enough stock");
+        $user = Auth::user();
+
+        // Permitir apenas admin e employee
+        if (!in_array($user->type, ['employee', 'board'])) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Verificar se o pedido está pendente
+        if ($order->status !== 'pending') {
+            return back()->with('error', 'Only pending orders can be completed.');
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // Verificar stock de todos os produtos
+            foreach ($order->products as $product) {
+                if ($product->stock < $product->order_item->quantity) {
+                    DB::rollBack();
+                    return back()->with('error', "O produto '{$product->name}' não tem stock suficiente.");
                 }
             }
 
-            // Update stock
-            foreach ($order->items as $item) {
-                $item->product->decrement('stock', $item->quantity);
+            // Atualizar stock
+            foreach ($order->products as $product) {
+                $product->decrement('stock', $product->order_item->quantity);
             }
 
-            // Update order status
+            // Atualizar o estado da encomenda
             $order->update(['status' => 'completed']);
 
-            // Here would go the PDF generation and email sending (to be implemented later)
-        });
+            // (Opcional) Gerar PDF e enviar email
+            // Envia email ao cliente
+            //Mail::to($order->member->email)->send(new OrderCompletedMail($order));
 
-        return back()->with('success', 'Order marked as completed');
+            DB::commit();
+            return back()->with('success', 'Pedido marcado como concluído.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Ocorreu um erro ao completar o pedido.');
+        }
+    }
+
+    public function showCancelForm(Order $order)
+    {
+        // Opcional: garantir que só 'board' e 'employee' podem cancelar
+        if (!in_array(Auth::user()->type, ['employee', 'board'])) {
+            abort(403);
+        }
+
+        // Redirecionar para a view do formulário de cancelamento
+        return view('orders.cancel', compact('order'));
     }
 
     public function cancel(Order $order, Request $request)
@@ -65,32 +110,66 @@ class OrderController extends Controller
             'cancel_reason' => 'required|string|max:255'
         ]);
 
-        DB::transaction(function () use ($order, $validated) {
-            // Only pending orders can be canceled
-            if ($order->status !== 'pending') {
-                return back()->with('error', 'Only pending orders can be canceled');
-            }
+        // Verificar antes se o pedido está pendente
+        if ($order->status !== 'pending') {
+            return back()->with('error', 'Only pending orders can be canceled');
+        }
 
-            // Update order status
-            $order->update([
-                'status' => 'canceled',
-                'cancel_reason' => $validated['cancel_reason']
-            ]);
+        // Verificar se o membro tem cartão para fazer reembolso
+        $operation = Operation::whereHas('order', function ($q) use ($order) {
+            $q->where('member_id', $order->member_id);
+        })->latest()->first();
 
-            // Refund to member's card
-            Operation::create([
-                'card_id' => $order->member->card->id,
-                'type' => 'credit',
-                'value' => $order->total,
-                'date' => now(),
-                'credit_type' => 'order_cancellation',
-                'order_id' => $order->id
-            ]);
+        $card = $operation?->card;
+        if (!$card) {
+            return back()->with('error', 'Member does not have a card to refund.');
+        }
 
-            // Update card balance
-            $order->member->card->increment('balance', $order->total);
-        });
+        try {
+            DB::transaction(function () use ($order, $validated, $card) {
+                $order->status = 'canceled';
+                $order->cancel_reason = $validated['cancel_reason'] ;
+                $order->save();
 
-        return back()->with('success', 'Order canceled and amount refunded');
+                foreach ($order->items as $item) {
+                    $product = $item->product;
+                    $product->stock += $item->quantity;
+                    $product->save();
+                }
+                // // Atualizar status da encomenda
+                // $order->update([
+                //     'status' => 'canceled',
+                //     'cancel_reason' => $validated['cancel_reason']
+                // ]);
+
+                // Criar operação de crédito para reembolso
+                Operation::create([
+                    'card_id' => $card->id,
+                    'type' => 'credit',
+                    'value' => $order->total,
+                    'date' => now(),
+                    'credit_type' => 'order_cancellation',
+                    'order_id' => $order->id
+                ]);
+
+                // Incrementar saldo do cartão
+                $card->increment('balance', $order->total);
+            });
+
+            return redirect()->route('orders.show', $order->id)->with('success', 'Order canceled and amount refunded');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error canceling order: ' . $e->getMessage());
+        }
     }
+
+    public function generateInvoice(Order $order)
+    {
+        if ($order->status !== 'completed') {
+            abort(403, 'Invoice only available for completed orders.');
+        }
+
+        $pdf = PDF::loadView('orders.invoice', compact('order'));
+        return $pdf->download('invoice_order_'.$order->id.'.pdf');
+    }
+
 }
