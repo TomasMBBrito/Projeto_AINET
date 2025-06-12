@@ -13,52 +13,60 @@ use App\Models\Operation;
 class CartController extends Controller
 {
     public function index()
-    {
-        $cartItems = [];
-        $total = 0;
-        $shippingCost = 0;
+{
+    $cartItems = [];
+    $total = 0;
+    $shippingCost = 0;
 
-        $sessionCart = session()->get('cart', []);
-        if (!empty($sessionCart)) {
-            $productIds = array_keys($sessionCart);
-            $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+    $sessionCart = session()->get('cart', []);
+    if (!empty($sessionCart)) {
+        $productIds = array_keys($sessionCart);
+        $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
 
-            foreach ($sessionCart as $productId => $item) {
-                if (isset($products[$productId])) {
-                    $effectivePrice = $this->calculateEffectivePrice($products[$productId], $item['quantity']);
+        foreach ($sessionCart as $productId => $item) {
+            $effectivePrice = $this->calculateEffectivePrice($products[$productId], $item['quantity']);
 
-                    $cartItems[$productId] = [
-                        'product_id' => $productId,
-                        'name' => $products[$productId]->name,
-                        'price' => $products[$productId]->price,
-                        'effective_price' => $effectivePrice,
-                        'quantity' => $item['quantity'],
-                        'subtotal' => $effectivePrice * $item['quantity'],
-                        'stock' => $products[$productId]->stock,
-                        'low_stock' => $item['quantity'] > $products[$productId]->stock,
-                    ];
-                    $total += $cartItems[$productId]['subtotal'];
-                }
-            }
-
-            // Calcular custo de envio baseado no valor total
-            $shippingCost = ShippingCost::getShippingCostForOrderTotal($total);
+            $cartItems[$productId] = [
+                'product_id' => $productId,
+                'name' => $products[$productId]->name,
+                'price' => $products[$productId]->price,
+                'effective_price' => $effectivePrice,
+                'quantity' => $item['quantity'],
+                'subtotal' => $effectivePrice * $item['quantity'],
+                'stock' => $products[$productId]->stock,
+                'low_stock' => $item['quantity'] > $products[$productId]->stock,
+                'discount_min_qty' => $products[$productId]->discount_min_qty,
+            ];
+            $total += $cartItems[$productId]['subtotal'];
         }
 
-        // Obter NIF e morada do utilizador se estiver autenticado
-        $nif = Auth::check() ? Auth::user()->nif : '';
-        $delivery_address = Auth::check() ? Auth::user()->default_delivery_address : '';
-
-        return view('cart.index', compact('cartItems', 'total', 'shippingCost', 'nif', 'delivery_address'));
+        $shippingCost = ShippingCost::getShippingCostForOrderTotal($total);
     }
+
+    $nif = Auth::check() ? Auth::user()->nif : '';
+    $delivery_address = Auth::check() ? Auth::user()->default_delivery_address : '';
+
+    return view('cart.index', compact('cartItems', 'total', 'shippingCost', 'nif', 'delivery_address'));
+}
 
     private function calculateEffectivePrice($product, $quantity)
     {
-        if ($product->discount_min_qty && $quantity >= $product->discount_min_qty && $product->discount > 0) {
+        if ($product->discount_min_qty && $product->discount > 0 && $quantity >= $product->discount_min_qty) {
             return max($product->price - $product->discount, 0);
         }
         return $product->price;
     }
+
+    /*private function calculateEffectivePrice($product, $quantity)
+{
+    // Força o desconto para todos os produtos com qualquer desconto ativo (para teste)
+    if ($product->discount > 0) {
+        return max($product->price - $product->discount, 0);
+    }
+    return $product->price;
+}*/
+
+
 
     public function add(Request $request)
     {
