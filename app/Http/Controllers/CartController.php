@@ -5,14 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\ShippingCost;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
-use App\Models\OrderItem as ItemOrder;
+use App\Models\OrderItem;
 use App\Models\Operation;
-use App\Services\Payment;
+use App\Models\Card;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
-class CartController extends Controller
+use Illuminate\Routing\Controller as BaseController;
+
+class CartController extends BaseController
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', 'verified'])->except(['index', 'add', 'update', 'remove', 'clearCart']);
+    }
+
     public function index()
     {
         $cartItems = [];
@@ -60,13 +68,13 @@ class CartController extends Controller
 
     public function add(Request $request)
     {
-        $productId = $request->input('product_id');
-        $quantity = $request->input('quantity', 1);
-
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
         ]);
+
+        $productId = $request->input('product_id');
+        $quantity = $request->input('quantity', 1);
 
         $cart = session()->get('cart', []);
         $cart[$productId] = [
@@ -80,19 +88,19 @@ class CartController extends Controller
 
     public function update(Request $request)
     {
-        $productId = $request->input('product_id');
-        $quantity = (int) $request->input('quantity', 1);
-
         $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:0',
         ]);
 
+        $productId = $request->input('product_id');
+        $quantity = (int) $request->input('quantity', 1);
+
         $cart = session()->get('cart', []);
         if ($quantity > 0) {
             $cart[$productId] = [
                 'product_id' => $productId,
-                'quantity' => $quantity
+                'quantity' => $quantity,
             ];
         } else {
             unset($cart[$productId]);
@@ -104,11 +112,11 @@ class CartController extends Controller
 
     public function remove(Request $request)
     {
-        $productId = $request->input('product_id');
-
         $request->validate([
             'product_id' => 'required|exists:products,id',
         ]);
+
+        $productId = $request->input('product_id');
 
         $cart = session()->get('cart', []);
         if (isset($cart[$productId])) {
@@ -122,14 +130,13 @@ class CartController extends Controller
     public function clearCart(Request $request)
     {
         session()->forget('cart');
-
         return redirect()->route('cart.index')->with('success', 'Carrinho limpo com sucesso!');
     }
 
     public function checkout(Request $request)
     {
         $request->validate([
-            'nif' => 'nullable|string|max:9',
+            'nif' => 'nullable|string|max:9|regex:/^[0-9]{9}$/',
             'delivery_address' => 'required|string|max:500',
         ]);
 
@@ -139,10 +146,10 @@ class CartController extends Controller
         }
 
         $user = Auth::user();
-        $card = $user->card;
+        $card = Card::where('id', $user->id)->first();
 
         if (!$card) {
-            return redirect()->route('card.create')->with('info', 'É necessário criar um cartão virtual para continuar.');
+            return redirect()->route('card.index')->with('error', 'É necessário um cartão virtual para continuar.');
         }
 
         if (!in_array($user->type, ['member', 'board'])) {
@@ -185,6 +192,10 @@ class CartController extends Controller
             }
         }
 
+        if ($hasLowStock) {
+            return redirect()->route('cart.index')->with('error', 'Alguns produtos estão sem stock ou excedem o stock disponível.');
+        }
+
         $shippingCost = ShippingCost::getShippingCostForOrderTotal($totalItems);
         $total = $totalItems + $shippingCost;
 
@@ -208,7 +219,6 @@ class CartController extends Controller
         }
 
         $orderData = session()->get('order_data');
-
         if (!$orderData) {
             return redirect()->route('cart.index')->with('error', 'Não há dados para confirmar a compra.');
         }
@@ -222,120 +232,81 @@ class CartController extends Controller
             return redirect()->route('login')->with('error', 'Faça login para continuar.');
         }
 
+        $user = Auth::user();
+        $card = Card::where('id', $user->id)->first();
         $orderData = session()->get('order_data');
+
         if (!$orderData) {
             return redirect()->route('cart.index')->with('error', 'Não há dados para finalizar a compra.');
         }
 
-        $user = Auth::user();
-        $card = $user->card;
-
-        // Simulate payment
-        $paymentMethod = $request->input('payment_method');
-        $paymentSuccess = false;
-        $paymentReference = null;
-
-        if (!$paymentMethod) {
-            return redirect()->route('cart.confirm')->with('error', 'Selecione um método de pagamento.');
+        if (!$card) {
+            return redirect()->route('card.index')->with('error', 'Cartão virtual não encontrado.');
         }
 
-        switch ($paymentMethod) {
-            case 'visa':
-                $cardNumber = $request->input('card_number');
-                $cvcCode = $request->input('cvc_code');
-                $request->validate([
-                    'card_number' => 'required|digits:16',
-                    'cvc_code' => 'required|digits:3',
-                ]);
-                $paymentSuccess = Payment::payWithVisa($cardNumber, $cvcCode);
-                $paymentReference = $cardNumber;
-                break;
-
-            case 'paypal':
-                $email = $request->input('email');
-                $request->validate([
-                    'email' => 'required|email',
-                ]);
-                $paymentSuccess = Payment::payWithPaypal($email);
-                $paymentReference = $email;
-                break;
-
-            case 'mbway':
-                $phoneNumber = $request->input('phone_number');
-                $request->validate([
-                    'phone_number' => 'required|digits:9|starts_with:9',
-                ]);
-                $paymentSuccess = Payment::payWithMBway($phoneNumber);
-                $paymentReference = $phoneNumber;
-                break;
-
-            default:
-                return redirect()->route('cart.confirm')->with('error', 'Método de pagamento inválido.');
-        }
-
-        if (!$paymentSuccess) {
-            session()->forget('order_data');
-            return redirect()->route('cart.confirm')->with('error', 'Pagamento falhou. Verifique os dados e tente novamente.');
-        }
-
-        // Revalidate balance after payment simulation (should be sufficient now)
+        // Validate card balance
         if ($card->balance < $orderData['total']) {
-            session()->forget('order_data');
-            return redirect()->route('card.add_balance')->with('error', 'Saldo insuficiente no cartão virtual.');
+            return redirect()->route('card.credit')->with('error', 'Saldo insuficiente no cartão virtual. Por favor, adicione fundos.');
         }
 
-        // Debit the card
-        $card->decrement('balance', $orderData['total']);
+        // Start a database transaction
+        DB::beginTransaction();
+        try {
+            // Debit the card
+            $card->balance -= $orderData['total'];
+            $card->save();
 
-        // Create order
-        $order = Order::create([
-            'member_id' => $user->id,
-            'status' => 'pending',
-            'date' => now()->toDateString(),
-            'total_items' => $orderData['totalItems'],
-            'shipping_cost' => $orderData['shippingCost'],
-            'total' => $orderData['total'],
-            'nif' => $orderData['nif'],
-            'delivery_address' => $orderData['delivery_address'],
-            'pdf_receipt' => null,
-            'cancel_reason' => null,
-            'custom' => null,
-        ]);
-
-        // Create order items and update stock
-        foreach ($orderData['cartItems'] as $item) {
-            ItemOrder::create([
-                'order_id' => $order->id,
-                'product_id' => $item['product_id'],
-                'quantity' => $item['quantity'],
-                'unit_price' => $item['unit_price'],
-                'discount' => $item['discount'],
-                'subtotal' => $item['subtotal'],
-                'custom' => null,
+            // Create order
+            $order = Order::create([
+                'member_id' => $user->id,
+                'status' => 'pending',
+                'date' => now()->toDateString(),
+                'total_items' => $orderData['totalItems'],
+                'shipping_cost' => $orderData['shippingCost'],
+                'total' => $orderData['total'],
+                'nif' => $orderData['nif'] ?: null,
+                'delivery_address' => $orderData['delivery_address'],
+                'pdf_receipt' => null,
+                'cancel_reason' => null,
             ]);
 
-            $product = Product::find($item['product_id']);
-            $product->decrement('stock', $item['quantity']);
+            // Create order items and update stock
+            foreach ($orderData['cartItems'] as $item) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
+                    'discount' => $item['discount'],
+                    'subtotal' => $item['subtotal'],
+                ]);
+
+                $product = Product::find($item['product_id']);
+                $product->stock -= $item['quantity'];
+                $product->save();
+            }
+
+            // Record operation
+            Operation::create([
+                'card_id' => $card->id,
+                'type' => 'debit',
+                'value' => $orderData['total'],
+                'date' => now()->toDateString(),
+                'debit_type' => 'order',
+                'order_id' => $order->id,
+                'payment_type' => null,
+                'payment_reference' => null,
+            ]);
+
+            // Clear session data
+            session()->forget(['cart', 'order_data']);
+
+            DB::commit();
+            return redirect()->route('purchase.index')->with('success', 'Compra concluída com sucesso! Pedido #' . $order->id . ' está a ser preparado.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('cart.confirm')->with('error', 'Erro ao finalizar a compra. Tente novamente.');
         }
-
-        // Record operation
-        Operation::create([
-            'card_id' => $card->id,
-            'type' => 'debit',
-            'value' => $orderData['total'],
-            'date' => now()->toDateString(),
-            'debit_type' => 'order',
-            'order_id' => $order->id,
-            'payment_type' => $paymentMethod,
-            'payment_reference' => $paymentReference,
-            'custom' => null,
-        ]);
-
-        // Clear session data
-        session()->forget('cart');
-        session()->forget('order_data');
-
-        return redirect()->route('orders-stock.index')->with('success', 'Compra concluída com sucesso! Pedido #' . $order->id . ' está a ser preparado.');
     }
 
     public static function syncCartAfterLogin($user)

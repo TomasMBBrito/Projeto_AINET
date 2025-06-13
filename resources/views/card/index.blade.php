@@ -1,46 +1,48 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold text-green-700 mb-6">My Virtual Card</h1>
+<div class="container mx-auto px-4 py-6">
+    <h2 class="text-2xl font-bold text-green-700 mb-6">Detalhes do Cartão</h2>
 
-    @if(!$card)
-        <p class="text-gray-600">You have no virtual card yet.</p>
-        <a href="{{ route('card.create') }}" class="mt-4 inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
-            <i data-lucide="plus"></i> Criar Novo Cartão
-        </a>
-    @else
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse bg-white shadow rounded">
-                <thead class="bg-green-600 text-white">
-                    <tr>
-                        <th class="px-4 py-3">Card Number</th>
-                        <th class="px-4 py-3">Balance</th>
-                        <th class="px-4 py-3 text-right">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="hover:bg-green-50 transition">
-                        <td class="px-4 py-3">*** {{ substr($card->card_number, -3) }}</td>
-                        <td class="px-4 py-3">€{{ number_format($card->balance, 2) }}</td>
-                        <td class="px-4 py-3 text-right">
-                            <a href="{{ route('card.add_balance') }}" class="inline-flex items-center text-green-700 hover:text-green-900 font-semibold transition">
-                                <i data-lucide="arrow-up-circle" class="w-5 h-5 mr-1"></i> Adicionar Saldo
-                            </a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="mt-6">
-            <a href="{{ route('card.transactions') }}" class="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-                <i data-lucide="list"></i> Histórico de Transações
-            </a>
+    @if (session('success'))
+        <div class="mt-4 p-4 bg-green-100 text-green-700 rounded flex items-center">
+            <span>{{ session('success') }}</span>
+            <button onclick="this.parentElement.style.display='none'" class="ml-4 text-green-500">×</button>
         </div>
     @endif
-</div>
 
-<script>
-    lucide.createIcons();
-</script>
+    @if (session('error'))
+        <div class="mt-4 p-4 bg-red-100 text-red-700 rounded">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <p class="text-gray-700 font-medium">Titular:</p>
+                <p class="text-gray-800">{{ $user->name }}</p>
+            </div>
+            <div>
+                <p class="text-gray-700 font-medium">Número do Cartão:</p>
+                <p class="text-gray-800">{{ $card->card_number }}</p>
+            </div>
+            <div>
+                <p class="text-gray-700 font-medium">Saldo Disponível:</p>
+                <p class="text-green-700 font-semibold">€{{ number_format($card->balance, 2) }}</p>
+            </div>
+        </div>
+
+        <div class="mt-6 flex space-x-4">
+            <a href="{{ route('card.credit') }}"
+               class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                Creditar Cartão
+            </a>
+            <a href="{{ route('card.transactions') }}"
+               class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                Histórico de Transações
+            </a>
+        </div>
+    </div>
+</div>
 @endsection

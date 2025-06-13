@@ -2,147 +2,147 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Payment;
+use App\Models\Card;
+use App\Models\Operation;
+use App\Models\User;
+use App\Models\Setting;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Card;
-use App\Models\Order;
-use App\Models\Operation;
-use App\Services\Payment;
+use Illuminate\Support\Facades\DB;
 
-class CardController extends Controller
+
+use Illuminate\Routing\Controller as BaseController;
+
+class CardController extends BaseController
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', 'verified']);
+    }
+
+    /**
+     * Display the member's card details.
+     */
     public function index()
     {
         $user = Auth::user();
-        $card = $user->cards; // Changed from card to cards to match User model relationship
+        $card = Card::where('id', $user->id)->first();
 
         if (!$card) {
-            return redirect()->route('card.create')->with('info', 'Crie um cartão virtual para continuar.');
+            return redirect()->route('home')->with('error', 'Nenhum cartão associado ao utilizador.');
         }
 
-        return view('card.index', compact('card'));
+        return view('card.index', compact('card', 'user'));
     }
 
-    public function create()
+    /**
+     * Show the form to credit the card.
+     */
+    public function showCreditForm()
     {
         $user = Auth::user();
-        if ($user->cards) { // Changed from card to cards
-            return redirect()->route('card.index')->with('info', 'Você já tem um cartão virtual.');
-        }
-        return view('card.create');
-    }
-
-    public function store(Request $request)
-    {
-        $user = Auth::user();
-        if ($user->cards) { // Changed from card to cards
-            return redirect()->route('card.index')->with('info', 'Você já tem um cartão virtual.');
-        }
-
-        do {
-            $cardNumber = rand(100000, 999999);
-        } while (Card::where('card_number', $cardNumber)->exists());
-
-        Card::create([
-            'id' => $user->id, // Changed from user_id to id to match cards table schema
-            'card_number' => $cardNumber,
-            'balance' => 0,
+        return view('card.credit', [
+            'default_payment_type' => $user->default_payment_type,
+            'default_payment_reference' => $user->default_payment_reference,
         ]);
-
-        return redirect()->route('card.index')->with('success', 'Cartão virtual criado com sucesso!');
     }
 
-    public function addBalance()
+    /**
+     * Process the card credit operation.
+     */
+    public function credit(Request $request)
     {
-        $user = Auth::user();
-        $card = $user->cards; // Changed from card to cards
-        if (!$card) {
-            return redirect()->route('card.create')->with('error', 'Crie um cartão virtual primeiro.');
-        }
-        return view('card.add-balance', compact('card'));
-    }
-
-    public function processPayment(Request $request)
-    {
-        $user = Auth::user();
-        $card = $user->cards; // Changed from card to cards
-        $amount = $request->input('amount');
-        $paymentMethod = $request->input('payment_method');
-
         $request->validate([
             'amount' => 'required|numeric|min:0.01',
-            'payment_method' => 'required|in:visa,paypal,mbway',
+            'payment_type' => 'required|in:Visa,PayPal,MB WAY',
+            'payment_reference' => 'required',
         ]);
 
-        if (!$card || $amount <= 0) {
-            return redirect()->back()->with('error', 'Dados inválidos.');
+        $user = Auth::user();
+        $card = Card::where('id', $user->id)->first();
+
+        if (!$card) {
+            return redirect()->route('card.index')->with('error', 'Nenhum cartão associado ao utilizador.');
         }
 
-        $paymentSuccess = false;
-        $paymentReference = null;
+        $amount = $request->input('amount');
+        $payment_type = $request->input('payment_type');
+        $payment_reference = $request->input('payment_reference');
 
-        switch ($paymentMethod) {
-            case 'visa':
-                $cardNumber = $request->input('card_number');
-                $cvcCode = $request->input('cvc_code');
+        // Validate payment based on payment type
+        $payment_success = false;
+        switch ($payment_type) {
+            case 'Visa':
+                $cvc_code = $request->input('cvc_code');
                 $request->validate([
-                    'card_number' => 'required|digits:16',
+                    'payment_reference' => 'digits:16',
                     'cvc_code' => 'required|digits:3',
                 ]);
-                $paymentSuccess = Payment::payWithVisa($cardNumber, $cvcCode);
-                $paymentReference = $cardNumber;
+                $payment_success = Payment::payWithVisa($payment_reference, $cvc_code);
                 break;
-
-            case 'paypal':
-                $email = $request->input('email');
+            case 'PayPal':
                 $request->validate([
-                    'email' => 'required|email',
+                    'payment_reference' => 'email',
                 ]);
-                $paymentSuccess = Payment::payWithPaypal($email);
-                $paymentReference = $email;
+                $payment_success = Payment::payWithPaypal($payment_reference);
                 break;
-
-            case 'mbway':
-                $phoneNumber = $request->input('phone_number');
+            case 'MB WAY':
                 $request->validate([
-                    'phone_number' => 'required|digits:9|starts_with:9',
+                    'payment_reference' => 'digits:9|starts_with:9',
                 ]);
-                $paymentSuccess = Payment::payWithMBway($phoneNumber);
-                $paymentReference = $phoneNumber;
+                $payment_success = Payment::payWithMBway($payment_reference);
                 break;
         }
 
-        if ($paymentSuccess) {
-            $card->increment('balance', $amount);
+        if (!$payment_success) {
+            return redirect()->route('card.credit')->with('error', 'Pagamento falhou. Verifique os dados fornecidos.');
+        }
+
+        // Start a transaction to ensure data consistency
+        DB::beginTransaction();
+        try {
+            // Update card balance
+            $card->balance += $amount;
+            $card->save();
+
+            // Record the operation
             Operation::create([
                 'card_id' => $card->id,
                 'type' => 'credit',
                 'value' => $amount,
                 'date' => now()->toDateString(),
-                'debit_type' => null,
                 'credit_type' => 'payment',
-                'payment_type' => $paymentMethod,
-                'payment_reference' => $paymentReference,
-                'order_id' => null,
-                'custom' => null,
+                'payment_type' => $payment_type,
+                'payment_reference' => $payment_reference,
             ]);
-            return redirect()->route('card.index')->with('success', 'Saldo adicionado com sucesso!');
-        } else {
-            return redirect()-> back()->with('error', 'Pagamento falhou. Verifique os dados e tente novamente.');
+
+            DB::commit();
+            return redirect()->route('card.index')->with('success', 'Cartão creditado com sucesso.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('card.credit')->with('error', 'Erro ao processar o crédito. Tente novamente.');
         }
     }
 
+    /**
+     * Display the transaction history.
+     */
     public function transactions()
     {
         $user = Auth::user();
-        $card = $user->cards; // Changed from card to cards
+        $card = Card::where('id', $user->id)->first();
+
         if (!$card) {
-            return redirect()->route('card.create')->with('info', 'Crie um cartão virtual primeiro.');
+            return redirect()->route('home')->with('error', 'Nenhum cartão associado ao utilizador.');
         }
 
-        $transactions = Operation::where('card_id', $card->id)->get();
-        $orders = Order::where('member_id', $user->id)->with('orderItems')->get();
+        $operations = Operation::where('card_id', $card->id)
+            ->with('order')
+            ->orderBy('date', 'desc')
+            ->get();
 
-        return view('card.transactions', compact('card', 'transactions', 'orders'));
+        return view('card.transactions', compact('card', 'operations'));
     }
 }

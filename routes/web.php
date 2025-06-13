@@ -64,7 +64,9 @@ Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 Route::post('/cart/clear-cart', [CartController::class, 'clearCart'])->name('cart.clear-cart');
-
+Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+Route::get('/cart/confirm', [CartController::class, 'showConfirm'])->name('cart.confirm');
+Route::post('/cart/finalize', [CartController::class, 'finalize'])->name('cart.finalize');
 Route::view('/sobre', 'pages.about')->name('about');
 Route::view('/contact', 'pages.about')->name('contact');
 Route::view('/faq', 'pages.about')->name('faq');
@@ -119,14 +121,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('membership_fee', [BusinessSettingsController::class, 'edit'])->name('settings.edit');
     Route::post('/membership_fee', [BusinessSettingsController::class, 'update'])->name('settings.update');
 
-    // Cartão Virtual
-    Route::get('/card', [CardController::class, 'index'])->name('card.index');
-    Route::get('/card/create', [CardController::class, 'create'])->name('card.create');
-    Route::post('/card', [CardController::class, 'store'])->name('card.store');
-    Route::get('/card/add-balance', [CardController::class, 'addBalance'])->name('card.add_balance');
-    Route::post('/card/add-balance', [CardController::class, 'processPayment'])->name('card.process_payment');
-    Route::get('/card/transactions', [CardController::class, 'transactions'])->name('card.transactions');
-
     // Quota de membro
     Route::get('/membership/pay', [MembershipFeeController::class, 'showPayMembership'])->name('membership.pay');
     Route::post('/membership/process', [MembershipFeeController::class, 'processMembershipFee'])->name('membership.process');
@@ -139,14 +133,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/admin/settings/shipping-costs/{shippingCost}', [ShippingCostController::class, 'update'])->name('admin.settings.shipping_costs.update');
     Route::delete('/admin/settings/shipping-costs/{shippingCost}', [ShippingCostController::class, 'destroy'])->name('admin.settings.shipping_costs.destroy');
 
-    Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
-    Route::get('/cart/confirm', [CartController::class, 'showConfirm'])->name('cart.confirm');
-    Route::post('/cart/finalize', [CartController::class, 'finalize'])->name('cart.finalize');
-
     Route::patch('/orders/{order}/complete', [OrderController::class, 'complete'])->name('orders.complete')
-         ->middleware('can:complete,order');
+        ->middleware('can:complete,order');
     Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel')
-         ->middleware('can:cancel,order');
+        ->middleware('can:cancel,order');
 
     // Supply Orders routes
     Route::get('/supply-orders', [SupplyOrderController::class, 'index'])->name('supply-orders.index');
@@ -156,6 +146,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Purchase routes
     Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
+
+    // Card routes
+    Route::get('/card', [CardController::class, 'index'])->name('card.index');
+    Route::get('/card/credit', [CardController::class, 'showCreditForm'])->name('card.credit');
+    Route::post('/card/credit', [CardController::class, 'credit'])->name('card.credit');
+    Route::get('/card/transactions', [CardController::class, 'transactions'])->name('card.transactions');
 });
 
 
