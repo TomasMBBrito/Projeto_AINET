@@ -8,6 +8,21 @@
             <h1 class="text-2xl font-bold">My Purchases</h1>
         </div>
 
+        @if (session('success'))
+            <div id="toast" class="mt-4 p-4 bg-green-100 text-green-700 rounded flex items-center">
+                <span>{{ session('success') }}</span>
+                <button onclick="document.getElementById('toast').style.display='none'" class="ml-4 text-green-500">
+                    ×
+                </button>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="mt-4 p-4 bg-red-100 text-red-700 rounded">
+                {{ session('error') }}
+            </div>
+        @endif
+
         <!-- Purchases Table -->
         <div class="bg-white rounded-lg shadow overflow-hidden">
             <table class="min-w-full divide-y divide-gray-200">

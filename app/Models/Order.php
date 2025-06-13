@@ -13,7 +13,7 @@ class Order extends Model
         'status',
         'date',
         'total_items',
-        'shipping_costs',
+        'shipping_cost',
         'total',
         'nif',
         'delivery_address',

@@ -145,7 +145,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/supply-orders/{supplyOrder}', [SupplyOrderController::class, 'destroy'])->name('supply-orders.destroy');
 
     // Purchase routes
-    Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
+    Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchase.index');
 
     // Card routes
     Route::get('/card', [CardController::class, 'index'])->name('card.index');

@@ -4,6 +4,12 @@
 <div class="container mx-auto px-4 py-6">
     <h2 class="text-2xl font-bold text-green-700 mb-6">Confirmar Compra</h2>
 
+        @if (session('error'))
+            <div class="mt-4 p-4 bg-red-100 text-red-700 rounded">
+                {{ session('error') }}
+            </div>
+        @endif
+
     <div class="bg-white rounded-lg shadow p-6">
         <ul class="divide-y divide-gray-200 mb-6">
             @foreach($orderData['cartItems'] as $item)

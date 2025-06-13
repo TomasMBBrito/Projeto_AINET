@@ -12,6 +12,7 @@ use App\Models\Card;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+
 use Illuminate\Routing\Controller as BaseController;
 
 class CartController extends BaseController
@@ -228,6 +229,8 @@ class CartController extends BaseController
 
     public function finalize(Request $request)
     {
+
+
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Faça login para continuar.');
         }
