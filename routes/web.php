@@ -19,7 +19,8 @@ use App\Http\Controllers\{
     CardController,
     MembershipFeeController,
     PurchaseController,
-    StatisticsController
+    StatisticsController,
+    FavoriteController
 };
 
 // Página inicial
@@ -60,6 +61,7 @@ Route::middleware('auth')->group(function () {
 
 // Rotas públicas (acessíveis a todos)
 Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+Route::get('/catalog/product/{id}', [CatalogController::class, 'show'])->name('catalog.product.show');
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
@@ -79,6 +81,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'changePassword'])->name('profile.password');
+
+    Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+    Route::post('/favorites/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');

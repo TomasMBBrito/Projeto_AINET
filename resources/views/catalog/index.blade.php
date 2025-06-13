@@ -42,55 +42,66 @@
         {{-- Grid de Produtos --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @foreach ($products as $product)
-                <div
-                    class="bg-white rounded-lg shadow-md hover:shadow-lg transition p-4 flex flex-col justify-between border border-green-100">
-                    {{-- Imagem --}}
-                    @if ($product->photo)
-                        <img src="{{ asset('storage/products/' . $product->photo) }}" alt="{{ $product->name }}"
-                            class="w-40 h-40 object-cover mx-auto rounded-lg shadow-md">
-                    @else
-                        <div class="w-full h-40 bg-green-50 flex items-center justify-center rounded mb-3 text-green-400">
-                            <span>No image</span>
-                        </div>
-                    @endif
+                <div class="relative">
+                    <a href="{{ route('catalog.product.show', $product->id) }}"
+                    class="block bg-white rounded-lg shadow-md hover:shadow-xl transition p-4 border border-green-100 h-full">
+                        {{-- Imagem --}}
+                        @if ($product->photo)
+                            <img src="{{ asset('storage/products/' . $product->photo) }}" alt="{{ $product->name }}"
+                                class="w-40 h-40 object-cover mx-auto rounded-lg shadow-md mb-3">
+                        @else
+                            <div class="w-full h-40 bg-green-50 flex items-center justify-center rounded mb-3 text-green-400">
+                                <span>No image</span>
+                            </div>
+                        @endif
 
-                    {{-- Nome e Categoria --}}
-                    <div>
+                        {{-- Nome e Categoria --}}
                         <h2 class="text-lg font-semibold text-green-900">{{ $product->name }}</h2>
                         <p class="text-sm text-green-600">{{ $product->category->name }}</p>
-                    </div>
 
-                    {{-- Preço e Desconto --}}
-                    <div class="mt-3">
-                        @if ($product->discount_min_qty && $product->discount && $product->stock >= $product->discount_min_qty)
-                            <p class="text-sm text-green-700 font-medium">
-                                €{{ number_format(max($product->price - $product->discount, 0), 2) }}
-                                <span class="line-through text-gray-400 ml-2">€{{ number_format($product->price, 2) }}</span>
-                            </p>
-                            <p class="text-xs text-green-500">
-                                Discount from {{ $product->discount_min_qty }} units
-                            </p>
-                        @else
-                            <p class="text-sm text-green-900 font-medium">
-                                €{{ number_format($product->price, 2) }}
-                            </p>
-                        @endif
-                    </div>
+                        <form method="POST" action="{{ route('favorites.toggle') }}" class="inline">
+                            @csrf
+                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+                            <button type="submit" style="background: none; border: none; cursor: pointer;">
+                                <i
+                                    class="fa-heart fa-lg {{ session('favorites', collect())->contains($product->id) ? 'fas text-red-600 hover:text-gray-600' : 'far text-gray-500 hover:text-red-600' }}"
+                                    ></i>
+                            </button>
+                        </form>
 
-                    {{-- Descrição --}}
-                    <p class="text-sm text-gray-600 mt-2">{{ $product->description }}</p>
+                        {{-- Preço e Desconto --}}
+                        <div class="mt-3">
+                            @if ($product->discount_min_qty && $product->discount && $product->stock >= $product->discount_min_qty)
+                                <p class="text-sm text-green-700 font-medium">
+                                    €{{ number_format(max($product->price - $product->discount, 0), 2) }}
+                                    <span class="line-through text-gray-400 ml-2">€{{ number_format($product->price, 2) }}</span>
+                                </p>
+                                <p class="text-xs text-green-500">
+                                    Discount from {{ $product->discount_min_qty }} units
+                                </p>
+                            @else
+                                <p class="text-sm text-green-900 font-medium">
+                                    €{{ number_format($product->price, 2) }}
+                                </p>
+                            @endif
+                        </div>
 
-                    {{-- Controles --}}
-                    <div class="mt-4 flex items-center justify-between">
-                        <span class="text-xs {{ $product->stock <= 0 ? 'text-red-500' : 'text-green-600' }} font-semibold">
+                        {{-- Descrição --}}
+                        <p class="text-sm text-gray-600 mt-2">{{ $product->description }}</p>
+
+                        {{-- Stock --}}
+                        <span class="text-xs block mt-4 {{ $product->stock <= 0 ? 'text-red-500' : 'text-green-600' }} font-semibold">
                             {{ $product->stock <= 0 ? 'Out of stock' : 'In stock' }}
                         </span>
+                    </a>
 
-                        <form action="{{ route('cart.add') }}" method="POST">
+                    {{-- Botão fora da âncora para evitar conflitos de clique --}}
+                    <div class="absolute bottom-4 right-4">
+                        <form action="{{ route('cart.add') }}" method="POST" class="flex items-center">
                             @csrf
                             <input type="hidden" name="product_id" value="{{ $product->id }}">
                             <input type="number" name="quantity" value="1" min="1"
-                                class="w-16 p-1 border rounded mr-2" />
+                                class="w-16 p-1 border rounded mr-2 text-sm" />
                             <button type="submit"
                                 class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm">
                                 Add to cart

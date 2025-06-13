@@ -10,6 +10,11 @@
 
         <!-- Navegação -->
         <nav class="flex items-center space-x-3 text-sm">
+            <a href="{{ route('favorites.index') }}"
+                    class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
+                    <i data-lucide="heart" class="w-4 h-4"></i>
+            </a>
+
             <a href="{{ route('catalog.index') }}"
                 class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
                 <i data-lucide="list" class="w-4 h-4"></i> Catalog
