@@ -86,10 +86,15 @@
                     <i data-lucide="credit-card" class="w-4 h-4"></i> My Card
                 </a>
 
+                <a href="{{ route('statistics') }}"
+                class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
+                    <i data-lucide="chart-candlestick" class="w-4 h-4"></i> Statistics
+                </a>
+
                 <a href="{{ route('profile.show') }}"
                     class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
                     <i data-lucide="user" class="w-4 h-4"></i> Profile
-                </a>
+                </a>               
 
                 <form method="POST" action="{{ route('logout') }}" class="inline">
                     @csrf

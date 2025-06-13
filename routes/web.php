@@ -18,7 +18,8 @@ use App\Http\Controllers\{
     CartController,
     CardController,
     MembershipFeeController,
-    PurchaseController
+    PurchaseController,
+    StatisticsController
 };
 
 // Página inicial
@@ -152,6 +153,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/card/credit', [CardController::class, 'showCreditForm'])->name('card.credit');
     Route::post('/card/credit', [CardController::class, 'credit'])->name('card.credit');
     Route::get('/card/transactions', [CardController::class, 'transactions'])->name('card.transactions');
+
+    Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics');
+    Route::get('/statistics/export', [StatisticsController::class, 'exportSales'])->name('statistics.export');
 });
 
 
