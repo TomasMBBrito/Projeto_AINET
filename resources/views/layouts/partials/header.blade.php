@@ -74,7 +74,7 @@
                     </a>
                 @endif
 
-                <a href="{{ route('cards.index') }}"
+                <a href="{{ route('card.index') }}"
                     class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
                     <i data-lucide="credit-card" class="w-4 h-4"></i> My Cards
                 </a>

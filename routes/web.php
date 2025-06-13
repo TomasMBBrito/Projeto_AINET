@@ -21,12 +21,11 @@ use App\Http\Controllers\{
     PurchaseController
 };
 
-
 // Página inicial
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::middleware('guest')->group(function () {
-    //login
+    // Login
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
 
@@ -37,10 +36,8 @@ Route::middleware('guest')->group(function () {
     // Recuperação de password
     Route::get('/password/reset', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
     Route::post('/password/email', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
-
     Route::get('/password/reset/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
     Route::post('/password/reset', [AuthController::class, 'reset'])->name('password.update');
-
 });
 
 Route::middleware('auth')->group(function () {
@@ -58,19 +55,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])
         ->middleware(['auth', 'signed', 'throttle:6,1'])
         ->name('verification.verify');
-
 });
 
 // Rotas públicas (acessíveis a todos)
 Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-//Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-Route::post('/cart/add/', [CartController::class, 'add'])->name('cart.add');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
-//Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 Route::post('/cart/clear-cart', [CartController::class, 'clearCart'])->name('cart.clear-cart');
-
 
 Route::view('/sobre', 'pages.about')->name('about');
 Route::view('/contact', 'pages.about')->name('contact');
@@ -87,27 +80,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/complete', [OrderController::class, 'complete'])->name('orders.complete');
-    // Mostrar o formulário de cancelamento
-    Route::get('/orders/{order}/cancel', [OrderController::class, 'showCancelForm'])
-        ->name('orders.cancel.form');
-
-    // Submeter a razão de cancelamento
-    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])
-        ->name('orders.cancel');
-
-    Route::get('/orders/{order}/invoice', [OrderController::class, 'generateInvoice'])
-    ->name('orders.invoice');
-
+    Route::get('/orders/{order}/cancel', [OrderController::class, 'showCancelForm'])->name('orders.cancel.form');
+    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::get('/orders/{order}/invoice', [OrderController::class, 'generateInvoice'])->name('orders.invoice');
     Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders/{order}/edit', [OrderController::class, 'edit'])->name('orders.edit');
     Route::put('/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
     Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
 
-    //Route::get('/test-gate', [UserManagementController::class, 'testGate']);
-
     // Gestão do website (apenas direção)
-    //Route::middleware('can:manageSite')->group(function () {
     Route::get('/admin/users', [UserManagementController::class, 'index'])->name('users.index');
     Route::get('/admin/users/create', [UserManagementController::class, 'create'])->name('users.create');
     Route::post('/admin/users', [UserManagementController::class, 'store'])->name('users.store');
@@ -118,57 +100,49 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/admin/users/{user}/board', [UserManagementController::class, 'toggleBoard'])->name('users.toggleBoard');
     Route::put('/admin/users/restore/{id}', [UserManagementController::class, 'restore'])->name('users.restore');
 
-    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');  //Página index das categorias
-    Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create'); //Criar categoria
-    Route::get('/categories/{category}', [CategoryController::class, 'edit'])->name('categories.edit'); //Editar categoria
-    Route::post('/categories/store', [CategoryController::class, 'store'])->name('categories.store');   //Armazenar categoria
-    Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update'); //Atualizar categoria
-    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');    //Eliminar categoria
-    Route::post('/categories/restore/{id}', [CategoryController::class, 'restore'])->name('categories.restore');    //Restaurar categoria -> ainda não funciona
+    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create');
+    Route::get('/categories/{category}', [CategoryController::class, 'edit'])->name('categories.edit');
+    Route::post('/categories/store', [CategoryController::class, 'store'])->name('categories.store');
+    Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+    Route::post('/categories/restore/{id}', [CategoryController::class, 'restore'])->name('categories.restore');
 
-    //Produtos | Feito c/filtragem
-    Route::get('/products', [ProductController::class, 'index'])->name('products.index');   //Página index dos produtos
-    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create'); //Criar produto
-    Route::post('/products/store', [ProductController::class, 'store'])->name('products.store'); //Armazena produto
-    Route::get('/products/{product}', [ProductController::class, 'edit'])->name('products.edit'); //Editar produto
-    Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update'); //Atualizar produto
-    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy'); //Eliminar produto
-    Route::post('/products/restore/{id}', [ProductController::class, 'restore'])->name('products.restore'); //Eliminação reversível do produto (restaurar)
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
+    Route::post('/products/store', [ProductController::class, 'store'])->name('products.store');
+    Route::get('/products/{product}', [ProductController::class, 'edit'])->name('products.edit');
+    Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+    Route::post('/products/restore/{id}', [ProductController::class, 'restore'])->name('products.restore');
 
-    //Taxa de adesão | Feito
     Route::get('membership_fee', [BusinessSettingsController::class, 'edit'])->name('settings.edit');
     Route::post('/membership_fee', [BusinessSettingsController::class, 'update'])->name('settings.update');
 
     // Cartão Virtual
-
-    Route::get('/cards', [CardController::class, 'index'])->name('cards.index');
-    Route::get('/card/create', [CardController::class, 'showCreate'])->name('card.create');
-    Route::post('/card/create', [CardController::class, 'storeCreate']);
-    Route::get('/card/{card}/topup', [CardController::class, 'topup'])->name('card.topup');
-    Route::post('/card/{card}/topup', [CardController::class, 'storeTopup'])->name('card.topup.store');
-
+    Route::get('/card', [CardController::class, 'index'])->name('card.index');
+    Route::get('/card/create', [CardController::class, 'create'])->name('card.create');
+    Route::post('/card', [CardController::class, 'store'])->name('card.store');
+    Route::get('/card/add-balance', [CardController::class, 'addBalance'])->name('card.add_balance');
+    Route::post('/card/add-balance', [CardController::class, 'processPayment'])->name('card.process_payment');
+    Route::get('/card/transactions', [CardController::class, 'transactions'])->name('card.transactions');
 
     // Quota de membro
     Route::get('/membership/pay', [MembershipFeeController::class, 'showPayMembership'])->name('membership.pay');
     Route::post('/membership/process', [MembershipFeeController::class, 'processMembershipFee'])->name('membership.process');
 
-    //Custos de envio
-    Route::get('/admin/settings/shipping-costs', [ShippingCostController::class, 'index'])->name('admin.settings.shipping_costs.index'); // Lista de custos de envio
-    Route::get('/admin/settings/shipping-costs/create', [ShippingCostController::class, 'create'])->name('admin.settings.shipping_costs.create'); // Criar novo custo de envio
-    Route::post('/admin/settings/shipping-costs/store', [ShippingCostController::class, 'store'])->name('admin.settings.shipping_costs.store'); // Armazenar novo custo de envio
-    Route::get('/admin/settings/shipping-costs/{shippingCost}/edit', [ShippingCostController::class, 'edit'])->name('admin.settings.shipping_costs.edit'); // Editar custo de envio
-    Route::put('/admin/settings/shipping-costs/{shippingCost}', [ShippingCostController::class, 'update'])->name('admin.settings.shipping_costs.update'); // Atualizar custo de envio existente
+    // Custos de envio
+    Route::get('/admin/settings/shipping-costs', [ShippingCostController::class, 'index'])->name('admin.settings.shipping_costs.index');
+    Route::get('/admin/settings/shipping-costs/create', [ShippingCostController::class, 'create'])->name('admin.settings.shipping_costs.create');
+    Route::post('/admin/settings/shipping-costs/store', [ShippingCostController::class, 'store'])->name('admin.settings.shipping_costs.store');
+    Route::get('/admin/settings/shipping-costs/{shippingCost}/edit', [ShippingCostController::class, 'edit'])->name('admin.settings.shipping_costs.edit');
+    Route::put('/admin/settings/shipping-costs/{shippingCost}', [ShippingCostController::class, 'update'])->name('admin.settings.shipping_costs.update');
     Route::delete('/admin/settings/shipping-costs/{shippingCost}', [ShippingCostController::class, 'destroy'])->name('admin.settings.shipping_costs.destroy');
 
     Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
-
-    // Página de confirmação da compra (checkout)
     Route::get('/cart/confirm', [CartController::class, 'showConfirm'])->name('cart.confirm');
+    Route::post('/cart/finalize', [CartController::class, 'finalize'])->name('cart.finalize');
 
-    // Confirmar e finalizar compra
-    Route::post('/cart/confirm', [CartController::class, 'finalize'])->name('cart.process');
-
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::patch('/orders/{order}/complete', [OrderController::class, 'complete'])->name('orders.complete')
          ->middleware('can:complete,order');
     Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel')
@@ -182,7 +156,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Purchase routes
     Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
-
 });
 
 

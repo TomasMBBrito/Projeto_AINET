@@ -9,45 +9,46 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
 use App\Models\OrderItem as ItemOrder;
 use App\Models\Operation;
+use App\Services\Payment;
 
 class CartController extends Controller
 {
     public function index()
-{
-    $cartItems = [];
-    $total = 0;
-    $shippingCost = 0;
+    {
+        $cartItems = [];
+        $total = 0;
+        $shippingCost = 0;
 
-    $sessionCart = session()->get('cart', []);
-    if (!empty($sessionCart)) {
-        $productIds = array_keys($sessionCart);
-        $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+        $sessionCart = session()->get('cart', []);
+        if (!empty($sessionCart)) {
+            $productIds = array_keys($sessionCart);
+            $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
 
-        foreach ($sessionCart as $productId => $item) {
-            $effectivePrice = $this->calculateEffectivePrice($products[$productId], $item['quantity']);
+            foreach ($sessionCart as $productId => $item) {
+                $effectivePrice = $this->calculateEffectivePrice($products[$productId], $item['quantity']);
 
-            $cartItems[$productId] = [
-                'product_id' => $productId,
-                'name' => $products[$productId]->name,
-                'price' => $products[$productId]->price,
-                'effective_price' => $effectivePrice,
-                'quantity' => $item['quantity'],
-                'subtotal' => $effectivePrice * $item['quantity'],
-                'stock' => $products[$productId]->stock,
-                'low_stock' => $item['quantity'] > $products[$productId]->stock,
-                'discount_min_qty' => $products[$productId]->discount_min_qty,
-            ];
-            $total += $cartItems[$productId]['subtotal'];
+                $cartItems[$productId] = [
+                    'product_id' => $productId,
+                    'name' => $products[$productId]->name,
+                    'price' => $products[$productId]->price,
+                    'effective_price' => $effectivePrice,
+                    'quantity' => $item['quantity'],
+                    'subtotal' => $effectivePrice * $item['quantity'],
+                    'stock' => $products[$productId]->stock,
+                    'low_stock' => $item['quantity'] > $products[$productId]->stock,
+                    'discount_min_qty' => $products[$productId]->discount_min_qty,
+                ];
+                $total += $cartItems[$productId]['subtotal'];
+            }
+
+            $shippingCost = ShippingCost::getShippingCostForOrderTotal($total);
         }
 
-        $shippingCost = ShippingCost::getShippingCostForOrderTotal($total);
+        $nif = Auth::check() ? Auth::user()->nif : '';
+        $delivery_address = Auth::check() ? Auth::user()->default_delivery_address : '';
+
+        return view('cart.index', compact('cartItems', 'total', 'shippingCost', 'nif', 'delivery_address'));
     }
-
-    $nif = Auth::check() ? Auth::user()->nif : '';
-    $delivery_address = Auth::check() ? Auth::user()->default_delivery_address : '';
-
-    return view('cart.index', compact('cartItems', 'total', 'shippingCost', 'nif', 'delivery_address'));
-}
 
     private function calculateEffectivePrice($product, $quantity)
     {
@@ -56,17 +57,6 @@ class CartController extends Controller
         }
         return $product->price;
     }
-
-    /*private function calculateEffectivePrice($product, $quantity)
-{
-    // Força o desconto para todos os produtos com qualquer desconto ativo (para teste)
-    if ($product->discount > 0) {
-        return max($product->price - $product->discount, 0);
-    }
-    return $product->price;
-}*/
-
-
 
     public function add(Request $request)
     {
@@ -149,29 +139,20 @@ class CartController extends Controller
         }
 
         $user = Auth::user();
-
-        // Verificar se o utilizador tem cartão virtual
         $card = $user->card;
+
         if (!$card) {
             return redirect()->route('card.create')->with('info', 'É necessário criar um cartão virtual para continuar.');
         }
 
-        // Verificar se o utilizador é um membro do clube (member ou board)
         if (!in_array($user->type, ['member', 'board'])) {
             return redirect()->route('membership.pay')->with('error', 'Apenas membros do clube podem realizar compras.');
         }
 
-        // Verificar se o utilizador está bloqueado
         if ($user->blocked) {
             return redirect()->route('cart.index')->with('error', 'A tua conta está bloqueada. Contacta o suporte.');
         }
 
-        // // Verificar se o pagamento da quota foi efetuado
-        // if (!$user->membership_fee_paid) {
-        //     return redirect()->route('membership_fee.pay_membership')->with('error', 'Deve pagar a quota para continuar.');
-        // }
-
-        // Calcular total dos produtos
         $sessionCart = session()->get('cart', []);
         if (empty($sessionCart)) {
             return redirect()->route('cart.index')->with('error', 'O carrinho está vazio.');
@@ -207,13 +188,7 @@ class CartController extends Controller
         $shippingCost = ShippingCost::getShippingCostForOrderTotal($totalItems);
         $total = $totalItems + $shippingCost;
 
-        // Verificar saldo do cartão virtual
-        if ($card->balance < $total) {
-            return redirect()->route('card.add_balance')->with('error', 'Saldo insuficiente no cartão virtual. Por favor, carregue o cartão.');
-        }
-
-        // Se passou todas as validações, leva para página de confirmação
-        // Guardar dados do pedido na sessão para confirmação final
+        // Store order data in session for confirmation
         session()->put('order_data', [
             'cartItems' => $cartItems,
             'totalItems' => $totalItems,
@@ -226,7 +201,6 @@ class CartController extends Controller
         return redirect()->route('cart.confirm');
     }
 
-    // Página de confirmação da compra
     public function showConfirm()
     {
         if (!Auth::check()) {
@@ -239,16 +213,9 @@ class CartController extends Controller
             return redirect()->route('cart.index')->with('error', 'Não há dados para confirmar a compra.');
         }
 
-        $cart = $orderData['cart'] ?? [];
-        $total = $orderData['total'] ?? 0;
-        $totalItems = $orderData['totalItems'] ?? 0;
-        $shippingCost = $orderData['shippingCost'] ?? 0;
-
-        return view('cart.confirm', compact('cart', 'total', 'totalItems', 'shippingCost'));
+        return view('cart.confirm', compact('orderData'));
     }
 
-
-    // Finaliza a compra após confirmação
     public function finalize(Request $request)
     {
         if (!Auth::check()) {
@@ -263,15 +230,64 @@ class CartController extends Controller
         $user = Auth::user();
         $card = $user->card;
 
-        // Revalidar saldo para evitar inconsistências
+        // Simulate payment
+        $paymentMethod = $request->input('payment_method');
+        $paymentSuccess = false;
+        $paymentReference = null;
+
+        if (!$paymentMethod) {
+            return redirect()->route('cart.confirm')->with('error', 'Selecione um método de pagamento.');
+        }
+
+        switch ($paymentMethod) {
+            case 'visa':
+                $cardNumber = $request->input('card_number');
+                $cvcCode = $request->input('cvc_code');
+                $request->validate([
+                    'card_number' => 'required|digits:16',
+                    'cvc_code' => 'required|digits:3',
+                ]);
+                $paymentSuccess = Payment::payWithVisa($cardNumber, $cvcCode);
+                $paymentReference = $cardNumber;
+                break;
+
+            case 'paypal':
+                $email = $request->input('email');
+                $request->validate([
+                    'email' => 'required|email',
+                ]);
+                $paymentSuccess = Payment::payWithPaypal($email);
+                $paymentReference = $email;
+                break;
+
+            case 'mbway':
+                $phoneNumber = $request->input('phone_number');
+                $request->validate([
+                    'phone_number' => 'required|digits:9|starts_with:9',
+                ]);
+                $paymentSuccess = Payment::payWithMBway($phoneNumber);
+                $paymentReference = $phoneNumber;
+                break;
+
+            default:
+                return redirect()->route('cart.confirm')->with('error', 'Método de pagamento inválido.');
+        }
+
+        if (!$paymentSuccess) {
+            session()->forget('order_data');
+            return redirect()->route('cart.confirm')->with('error', 'Pagamento falhou. Verifique os dados e tente novamente.');
+        }
+
+        // Revalidate balance after payment simulation (should be sufficient now)
         if ($card->balance < $orderData['total']) {
+            session()->forget('order_data');
             return redirect()->route('card.add_balance')->with('error', 'Saldo insuficiente no cartão virtual.');
         }
 
-        // Debitar o cartão
+        // Debit the card
         $card->decrement('balance', $orderData['total']);
 
-        // Criar pedido
+        // Create order
         $order = Order::create([
             'member_id' => $user->id,
             'status' => 'pending',
@@ -286,7 +302,7 @@ class CartController extends Controller
             'custom' => null,
         ]);
 
-        // Criar itens do pedido
+        // Create order items and update stock
         foreach ($orderData['cartItems'] as $item) {
             ItemOrder::create([
                 'order_id' => $order->id,
@@ -297,9 +313,12 @@ class CartController extends Controller
                 'subtotal' => $item['subtotal'],
                 'custom' => null,
             ]);
+
+            $product = Product::find($item['product_id']);
+            $product->decrement('stock', $item['quantity']);
         }
 
-        // Registrar operação
+        // Record operation
         Operation::create([
             'card_id' => $card->id,
             'type' => 'debit',
@@ -307,12 +326,12 @@ class CartController extends Controller
             'date' => now()->toDateString(),
             'debit_type' => 'order',
             'order_id' => $order->id,
-            'payment_type' => $user->default_payment_type,
-            'payment_reference' => $user->default_payment_reference,
+            'payment_type' => $paymentMethod,
+            'payment_reference' => $paymentReference,
             'custom' => null,
         ]);
 
-        // Limpar o carrinho e dados da sessão
+        // Clear session data
         session()->forget('cart');
         session()->forget('order_data');
 
@@ -321,12 +340,11 @@ class CartController extends Controller
 
     public static function syncCartAfterLogin($user)
     {
-        // Restaurar dados de checkout se existirem
         if (session()->has('checkout_data')) {
             $checkoutData = session()->get('checkout_data');
             $user->update([
                 'nif' => $checkoutData['nif'] ?? $user->nif,
-                'address' => $checkoutData['address'] ?? $user->address
+                'default_delivery_address' => $checkoutData['delivery_address'] ?? $user->default_delivery_address,
             ]);
             session()->forget('checkout_data');
         }

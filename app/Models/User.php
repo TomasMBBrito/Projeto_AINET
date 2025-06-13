@@ -32,7 +32,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
     ];
 
-    protected function casts():array
+    protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
@@ -72,7 +72,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function cards()
     {
-        return $this->hasMany(Card::class);
+        return $this->hasOne(Card::class, 'id', 'id'); // Specify id as the foreign key
     }
 
     public function orders()

@@ -11,7 +11,7 @@
             </p>
         </div>
 
-        <form action="{{ route('card.create') }}" method="POST" class="flex flex-col space-y-4">
+        <form action="{{ route('card.store') }}" method="POST" class="flex flex-col space-y-4">
             @csrf
             <button type="submit" class="w-full bg-green-600 text-white font-semibold py-2 px-4 rounded hover:bg-green-700 transition">
                 Criar Cartão Agora

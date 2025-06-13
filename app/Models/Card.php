@@ -3,29 +3,34 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\User;
 use App\Models\Operation;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class Card extends Model
 {
-    USE HasFactory;
-    protected $table = 'cards'; // ou 'cartoes' conforme a migração
+    use HasFactory;
+
+    protected $table = 'cards';
+    protected $primaryKey = 'id';
+    public $incrementing = false;
+    protected $keyType = 'int';
+
+    public $timestamps = false;
 
     protected $fillable = [
-        'id', // user_id
+        'id',           // Changed from user_id to id to match the database schema
         'card_number',
         'balance',
     ];
 
-    public $timestamps = false; // Se não tiver `created_at` e `updated_at`
-
     public function user()
     {
-        return $this->belongsTo(User::class, 'id'); //user_id na base de dados, ter atenção
+        return $this->belongsTo(User::class, 'id', 'id'); // Specify id as the foreign key
     }
 
     public function operations()
     {
-        return $this->hasMany(Operation::class);
+        return $this->hasMany(Operation::class, 'card_id');
     }
 }
