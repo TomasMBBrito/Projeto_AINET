@@ -13,6 +13,16 @@
         </div>
     @endif
 
+    @if ($errors->any())
+        <div class="bg-red-100 text-red-800 p-4 rounded mb-4">
+            <ul class="list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('PUT')
@@ -39,7 +49,7 @@
             </div>
 
             <div>
-                <label class="block text-gray-700 font-medium">Progile photo</label>
+                <label class="block text-gray-700 font-medium">Profile photo</label>
                 <input type="file" name="photo" class="w-full mt-1 p-2 border border-gray-300 rounded-lg">
             </div>
 

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Operation;
 use App\Models\Setting;
+use App\Models\Card;
 
 class MembershipFeeController extends Controller
 {
@@ -17,7 +18,7 @@ class MembershipFeeController extends Controller
             return redirect()->route('cart.confirm');
         }
 
-        $membershipFee = Setting::getValue('membership_fee', 100); // 50 é default
+        $membershipFee = Setting::getValue('membership_fee', 100);
 
         return view('membership_fee.pay',compact('membershipFee'));
     }
@@ -25,16 +26,16 @@ class MembershipFeeController extends Controller
     public function processMembershipFee(Request $request)
     {
         $user = Auth::user();
-        $card = $user->card;
+        $card = Card::where('id', $user->id)->first();
 
-        if (!$card) {
-            return redirect()->route('card.create')->with('error', 'Crie o cartão virtual antes de pagar a quota.');
-        }
+        // if (!$card) {
+        //     return redirect()->route('card.create')->with('error', 'Crie o cartão virtual antes de pagar a quota.');
+        // }
 
-        $membershipFee = 50; // Valor da quota (exemplo)
+        $membershipFee = Setting::getValue('membership_fee', 100);
 
         if ($card->balance < $membershipFee) {
-            return redirect()->route('card.topup')->with('error', 'Saldo insuficiente. Por favor, adicione saldo ao cartão.');
+            return redirect()->route('card.credit')->with('error', 'Saldo insuficiente. Por favor, adicione saldo ao cartão.');
         }
 
         // Debitar valor da quota no cartão virtual
@@ -57,6 +58,6 @@ class MembershipFeeController extends Controller
             'custom' => null,
         ]);
 
-        return redirect()->route('cart.confirm')->with('success', 'Quota paga com sucesso. Pode agora concluir a compra.');
+        return back()->with('success', 'Membership fee paid.');
     }
 }

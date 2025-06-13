@@ -12,6 +12,16 @@
         </div>
     @endif
 
+    @if ($errors->any())
+        <div class="bg-red-100 text-red-800 p-4 rounded mb-4">
+            <ul class="list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div class="flex justify-between items-center mb-4">
         <form method="GET" action="{{ route('users.index') }}" class="flex gap-2 flex-wrap">
             <input type="text" name="search" placeholder="Procurar..." class="border border-gray-300 p-2 rounded" value="{{ request('search') }}">
@@ -24,18 +34,18 @@
             <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Filtrar</button>
         </form>
 
-        <a href="{{ route('users.create') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Novo Funcionário</a>
+        <a href="{{ route('users.create') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">New Employee</a>
     </div>
 
     <table class="w-full table-auto border text-sm">
         <thead class="bg-gray-100 text-left">
             <tr>
                 <th class="p-2">ID</th>
-                <th>Nome</th>
+                <th>Name</th>
                 <th>Email</th>
-                <th>Tipo</th>
-                <th>Bloqueado</th>
-                <th>Ações</th>
+                <th>Type</th>
+                <th>Blocked</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -60,16 +70,16 @@
                                 @csrf 
                                 @method('PUT')
                                 <button type="submit" class="inline-flex items-center bg-yellow-500 text-white px-5 py-3 rounded hover:bg-yellow-600 transition">
-                                    Restaurar
+                                    Restore
                                 </button>
                             </form>
                         @else
                             <form method="POST" action="{{ route('users.destroy', $user) }}">
                                 @csrf 
                                 @method('DELETE')
-                                <button onclick="return confirm('Cancelar subscrição?')" 
+                                <button onclick="return confirm('Cancel Subscription?')" 
                                         class="inline-flex items-center bg-red-500 text-white px-5 py-3 rounded hover:bg-red-600 transition">
-                                    Cancelar
+                                    Delete account
                                 </button>
                             </form>
                         @endif
@@ -80,7 +90,7 @@
                                 @csrf 
                                 @method('PUT')
                                 <button type="submit" class="inline-flex items-center bg-purple-500 text-white px-5 py-3 rounded hover:bg-purple-600 transition">
-                                    {{ $user->type === 'member' ? 'Promover' : 'Rebaixar' }}
+                                    {{ $user->type === 'member' ? 'Promote' : 'Demote' }}
                                 </button>
                             </form>
                         @endif

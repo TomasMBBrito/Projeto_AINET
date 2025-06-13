@@ -74,9 +74,16 @@
                     </a>
                 @endif
 
+                @if (Auth::user()->type == 'pending_member')
+                    <a href="{{ route('membership.pay') }}"
+                        class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
+                        <i data-lucide="banknote" class="w-4 h-4"></i> Pay Membership
+                    </a>
+                @endif
+
                 <a href="{{ route('card.index') }}"
                     class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
-                    <i data-lucide="credit-card" class="w-4 h-4"></i> My Cards
+                    <i data-lucide="credit-card" class="w-4 h-4"></i> My Card
                 </a>
 
                 <a href="{{ route('profile.show') }}"

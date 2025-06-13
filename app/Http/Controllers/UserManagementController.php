@@ -52,7 +52,7 @@ class UserManagementController extends Controller
 
         User::create($validated);
 
-        return redirect()->route('admin.users.index')->with('success', 'Funcionário adicionado com sucesso!');
+        return redirect()->route('users.index')->with('success', 'Funcionário adicionado com sucesso!');
     }
 
     public function edit(User $user)
@@ -85,30 +85,36 @@ class UserManagementController extends Controller
 
         $user->update($data);
 
-        return redirect()->route('admin.users.index')->with('success', 'Utilizador atualizado com sucesso!');
+        return redirect()->route(route: 'users.index')->with('success', 'Utilizador atualizado com sucesso!');
     }
 
     public function destroy(User $user)
     {
         if (auth()->id() === $user->id) {
-            return redirect()->back()->withErrors(['error' => 'Não pode cancelar a sua própria conta.']);
+            return redirect()->back()->withErrors(['error' => 'You can`t cancel your own account.']);
         }
 
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('success', 'Subscrição cancelada (soft delete).');
+        return redirect()->route('users.index')->with('success', 'Subscrição cancelada (soft delete).');
     }
 
     public function toggleBlock(User $user)
     {
+        if (auth()->id() === $user->id) {
+            return redirect()->back()->withErrors(['error' => 'You can`t block your own account.']);
+        }
         $user->blocked = !$user->blocked;
         $user->save();
 
-        return redirect()->route('admin.users.index')->with('success', 'Estado de bloqueio atualizado.');
+        return redirect()->route('users.index')->with('success', 'Estado de bloqueio atualizado.');
     }
 
     public function toggleBoard(User $user)
     {
+        if($user->blocked){
+            return redirect()->back()->withErrors(['error' => 'You can`t promote a blocked account.']);
+        }
         if ($user->type === 'member') {
             $user->type = 'board';
         } elseif ($user->type === 'board') {
@@ -117,7 +123,7 @@ class UserManagementController extends Controller
 
         $user->save();
 
-        return redirect()->route('admin.users.index')->with('success', 'Tipo de utilizador atualizado.');
+        return redirect()->route('users.index')->with('success', 'Tipo de utilizador atualizado.');
     }
 
     public function restore($id)
@@ -125,7 +131,7 @@ class UserManagementController extends Controller
         $user = User::withTrashed()->findOrFail($id);
         $user->restore();
 
-        return redirect()->route('admin.users.index')->with('success', 'Conta restaurada.');
+        return redirect()->route('users.index')->with('success', 'Conta restaurada.');
     }
 
     // public function testGate()

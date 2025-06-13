@@ -57,7 +57,7 @@
                 @error('cvc_code')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
-            </div>
+            </div>       
 
             <button type="submit"
                     class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded transition">
