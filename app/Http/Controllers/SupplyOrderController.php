@@ -18,7 +18,7 @@ class SupplyOrderController extends Controller
                 $q->where('stock', '<', DB::raw('stock_lower_limit'));
             })
             ->orderBy('stock')
-            ->get();
+            ->paginate(10);
 
         $supplyOrders = SupplyOrder::with(['product', 'registeredBy'])
             ->when(request('status'), function($q) {

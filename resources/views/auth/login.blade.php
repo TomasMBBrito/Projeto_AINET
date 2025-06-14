@@ -41,29 +41,29 @@
                 <div>
                     <label for="email" class="block text-md font-medium text-gray-700 mb-2">Email</label>
                     <input type="email" name="email" 
-                           class="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                           class="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
                            required placeholder="example@example.com" autofocus>
                 </div>
 
                 <div>
                     <label for="password" class="block text-md font-medium text-gray-700 mb-2">Password</label>
                     <input type="password" name="password" 
-                           class="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                           class="w-full px-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
                            required placeholder="Your Password">
                 </div>
 
                 <div class="mt-2 text-right">
-                    <a href="{{ route('password.request') }}" class="text-sm text-blue-500 hover:underline">Forgot Your Password?</a>
+                    <a href="{{ route('password.request') }}" class="text-sm text-green-500 hover:underline">Forgot Your Password?</a>
                 </div>
 
                 <button type="submit" 
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02]">
+                        class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02]">
                     Login
                 </button>
 
                 <p class="text-md text-center text-black">
                     Don't have an account yet? 
-                    <a href="{{ route('register') }}" class="text-blue-500 focus:outline-none focus:underline hover:underline">Sign up</a>.
+                    <a href="{{ route('register') }}" class="text-green-500 focus:outline-none focus:underline hover:underline">Sign up</a>.
                 </p>
                 <p class="text-md text-center text-black">
                     © {{ date('Y') }} Grocery Club has all rights reserved.

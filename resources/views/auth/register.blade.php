@@ -37,35 +37,35 @@
                     <div>
                         <label class="block text-md font-medium text-gray-700 mb-1">Name</label>
                         <input type="text" name="name" value="{{ old('name') }}"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
                             required>
                     </div>
 
                     <div>
                         <label class="block text-md font-medium text-gray-700 mb-1">Email</label>
                         <input type="email" name="email" value="{{ old('email') }}"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
                             required>
                     </div>
 
                     <div>
                         <label class="block text-md font-medium text-gray-700 mb-1">Password</label>
                         <input type="password" name="password"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
                             required>
                     </div>
 
                     <div>
                         <label class="block text-md font-medium text-gray-700 mb-1">Confirm Password</label>
                         <input type="password" name="password_confirmation"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
                             required>
                     </div>
 
                     <div>
                         <label class="block text-md font-medium text-gray-700 mb-1">Gender</label>
                         <select name="gender"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
                             required>
                             <option value="">Selecione</option>
                             <option value="M" {{ old('gender') === 'M' ? 'selected' : '' }}>Male</option>
@@ -82,19 +82,19 @@
                     <div>
                         <label class="block text-md font-medium text-gray-700 mb-1">NIF</label>
                         <input type="text" name="nif" value="{{ old('nif') }}"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
                     </div>
 
                     <div>
                         <label class="block text-md font-medium text-gray-700 mb-1">Address</label>
                         <input type="text" name="default_delivery_address" value="{{ old('default_delivery_address') }}"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
                     </div>
 
                     <div>
                         <label class="block text-md font-medium text-gray-700 mb-1">Payment Type</label>
                         <select name="default_payment_type"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
                             <option value="">None</option>
                             <option value="Visa" {{ old('default_payment_type') === 'Visa' ? 'selected' : '' }}>Visa</option>
                             <option value="PayPal" {{ old('default_payment_type') === 'PayPal' ? 'selected' : '' }}>PayPal</option>
@@ -105,17 +105,17 @@
                     <div>
                         <label class="block text-md font-medium text-gray-700 mb-1">Reference</label>
                         <input type="text" name="default_payment_reference" value="{{ old('default_payment_reference') }}"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
                     </div>
                 </div>
 
                 <button type="submit"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02]">
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02]">
                     Register
                 </button>
 
                 <p class="text-md text-center text-black">
-                    Already have an account? <a href="{{ route('login') }}" class="text-blue-500 hover:underline">Login</a>.
+                    Already have an account? <a href="{{ route('login') }}" class="text-green-500 hover:underline">Login</a>.
                 </p>
                 <p class="text-md text-center text-black">
                     © {{ date('Y') }} Grocery Club has all rights reserved.

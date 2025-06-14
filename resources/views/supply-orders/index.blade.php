@@ -60,6 +60,9 @@
                 </div>
                 @endforeach
             </div>
+            <div class="px-6 py-4">
+                {{ $products->appends(request()->query())->links() }}
+            </div>
         </div>
 
         <!-- Supply Orders List -->
@@ -72,10 +75,14 @@
                 <div class="px-6 py-4">
                     <div class="flex justify-between items-start">
                         <div>
-                            <h3 class="font-medium">{{ $order->product->name }}</h3>
+                            @if($order->product)
+                                    <h3 class="font-medium">{{ $order->product->name }}</h3>
+                                @else
+                                    <h3 class="font-medium text-red-600">[Product deleted]</h3>
+                                @endif
                             <p class="text-sm text-gray-600">
                                 Quantity: {{ $order->quantity }} |
-                                Created by: {{ $order->registeredBy->name }} |
+                                Created by: {{ $order->registeredBy ? $order->registeredBy->name : '[User deleted]' }} |
                                 {{ $order->created_at->format('d/m/Y H:i') }}
                             </p>
                         </div>
@@ -106,7 +113,7 @@
                 @endforelse
             </div>
             <div class="px-6 py-4">
-                {{ $supplyOrders->links() }}
+                {{ $supplyOrders->appends(request()->query())->links() }}
             </div>
         </div>
     </div>
