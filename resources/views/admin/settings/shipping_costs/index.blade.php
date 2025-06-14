@@ -22,11 +22,11 @@
                             <td class="p-2 border">{{ $cost->min_value_threshold }}</td>
                             <td class="p-2 border">{{ $cost->max_value_threshold }}</td>
                             <td class="p-2 border">
-                                {{ $cost->shipping_cost == 0 ? 'Grátis' : number_format($cost->shipping_cost, 2, ',', '.') . ' €' }}
+                                {{ $cost->shipping_cost == 0 ? 'Free' : number_format($cost->shipping_cost, 2, ',', '.') . ' €' }}
                             </td>
                             <td class="p-2 border">
                                 <a href="{{ route('admin.settings.shipping_costs.edit', $cost) }}"
-                                    class="text-blue-600 hover:underline">Editar</a>
+                                    class="text-blue-600 hover:underline">Edit</a>
                                 <form action="{{ route('admin.settings.shipping_costs.destroy', $cost) }}" method="POST"
                                     class="inline-block ml-2">
                                     @csrf

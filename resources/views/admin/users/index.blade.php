@@ -55,7 +55,7 @@
                     <td>{{ $user->name }}</td>
                     <td>{{ $user->email }}</td>
                     <td>{{ ucfirst($user->type) }}</td>
-                    <td>{{ $user->blocked ? 'Sim' : 'Não' }}</td>
+                    <td>{{ $user->blocked ? 'Yes' : 'No' }}</td>
                     <td class="flex flex-wrap gap-2 py-2">
 
                         {{-- Editar --}}

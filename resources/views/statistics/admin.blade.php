@@ -16,7 +16,7 @@
                 @for ($date = $end; $date >= $start; $date->subMonth())
                     @php
                         $value = $date->format('Y-m');
-                        $label = $date->translatedFormat('F \d\e Y'); // ex: Junho de 2025
+                        $label = $date->translatedFormat('F \o\f Y'); // ex: Junho de 2025
                     @endphp
                     <option value="{{ $value }}" @selected(request('month') == $value)>{{ ucfirst($label) }}</option>
                 @endfor

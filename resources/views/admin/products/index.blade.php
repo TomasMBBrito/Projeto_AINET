@@ -4,7 +4,7 @@
     <div class="max-w-7xl mx-auto px-4 py-8">
 
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-            <h2 class="text-2xl font-bold text-green-700">Gestão de Produtos</h2>
+            <h2 class="text-2xl font-bold text-green-700">Product Management</h2>
             <div class="flex space-x-2 mt-4 sm:mt-0">
                 <a href="{{ route('products.create') }}"
                     class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">
@@ -18,7 +18,7 @@
                 <label for="category" class="block text-gray-700 font-medium mb-1">Category</label>
                 <select name="category" id="category"
                     class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option value="">Todas</option>
+                    <option value="">All</option>
                     @foreach ($categories as $category)
                         <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
                             {{ $category->name }}

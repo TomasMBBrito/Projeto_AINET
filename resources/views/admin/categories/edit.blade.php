@@ -18,7 +18,7 @@
         <div>
             <label class="block text-gray-700 font-semibold mb-2">Current Image</label>
             @if($category->image)
-                <img src="{{ asset('storage/categories/' . $category->image) }}" alt="Imagem da Categoria"
+                <img src="{{ asset('storage/categories/' . $category->image) }}" alt="Category Image"
                      class="w-24 h-24 object-cover rounded border mb-3">
             @else
                 <p class="text-gray-500 italic mb-3">No image</p>
