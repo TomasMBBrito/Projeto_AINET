@@ -15,14 +15,14 @@
         @endif
 
         <div>
-            <label for="name" class="block font-semibold">Nome</label>
+            <label for="name" class="block font-semibold">Name</label>
             <input type="text" name="name" value="{{ old('name', $product->name ?? '') }}" class="w-full p-2 border rounded-lg">
         </div>
 
         <div>
             <label for="category_id" class="block font-semibold">Categoria</label>
             <select name="category_id" class="w-full p-2 border rounded-lg">
-                <option value="">Selecione</option>
+                <option value="">Select</option>
                 @foreach ($categories as $id => $name)
                     <option value="{{ $id }}" {{ (old('category_id', $product->category_id ?? '') == $id) ? 'selected' : '' }}>{{ $name }}</option>
                 @endforeach
@@ -30,7 +30,7 @@
         </div>
 
         <div>
-            <label for="price" class="block font-semibold">Preço (€)</label>
+            <label for="price" class="block font-semibold">Price (€)</label>
             <input type="number" step="0.01" name="price" value="{{ old('price', $product->price ?? '') }}" class="w-full p-2 border rounded-lg">
         </div>
 
@@ -40,22 +40,22 @@
         </div>
 
         <div>
-            <label for="description" class="block font-semibold">Descrição</label>
+            <label for="description" class="block font-semibold">Description</label>
             <textarea name="description" class="w-full p-2 border rounded-lg" rows="4">{{ old('description', $product->description ?? '') }}</textarea>
         </div>
 
         <div>
-            <label for="discount_min_qty" class="block font-semibold">Qtd. mínima para desconto</label>
+            <label for="discount_min_qty" class="block font-semibold">Minimum quantity for discount</label>
             <input type="number" name="discount_min_qty" value="{{ old('discount_min_qty', $product->discount_min_qty ?? '') }}" class="w-full p-2 border rounded-lg">
         </div>
 
         <div>
-            <label for="discount" class="block font-semibold">Percentual de desconto (%)</label>
+            <label for="discount" class="block font-semibold">Discount percentage (%)</label>
             <input type="number" name="discount" step="0.01" value="{{ old('discount', $product->discount ?? '') }}" class="w-full p-2 border rounded-lg">
         </div>
 
         <div>
-            <label for="photo" class="block font-semibold">Foto (upload)</label>
+            <label for="photo" class="block font-semibold">Photo (upload)</label>
             <input type="file" name="photo" class="w-full p-2 border rounded-lg">
             @if(isset($product) && $product->photo)
                 <img src="{{ asset('storage/' . $product->photo) }}" class="mt-2 h-24">

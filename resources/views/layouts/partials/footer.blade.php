@@ -2,13 +2,13 @@
     <div class="container mx-auto px-4 text-center grid grid-cols-1 md:grid-cols-3 gap-8">
         <!-- Sobre -->
         <div>
-            <h5 class="font-bold mb-2">Sobre</h5>
-            <p>Grocery Club é a sua loja online de confiança para produtos frescos e de qualidade.</p>
+            <h5 class="font-bold mb-2">About</h5>
+            <p>Grocery Club is your trusted online store for fresh, quality products.</p>
         </div>
 
         <!-- Links Úteis -->
         <div>
-            <h5 class="font-bold mb-2">Links Úteis</h5>
+            <h5 class="font-bold mb-2">Useful Links</h5>
             <ul>
                 <li><a href="{{ route('catalog.index') }}" class="hover:underline">Catalog</a></li>
                 <li><a href="{{ route('about') }}" class="hover:underline">About us</a></li>

@@ -24,7 +24,7 @@
 
                         {{-- Nome e Categoria --}}
                         <h2 class="text-lg font-semibold text-green-900">{{ $product->name }}</h2>
-                        <p class="text-sm text-green-600">{{ $product->category->name }}</p>                        
+                        <p class="text-sm text-green-600">{{ $product->category->name }}</p>
 
                         {{-- Preço e Desconto --}}
                         <div class="mt-3">
@@ -72,7 +72,7 @@
                             <input type="hidden" name="product_id" value="{{ $product->id }}">
                             <button type="submit" class="text-red-600 hover:text-red-700 flex items-center space-x-2">
                                 <i class="fas fa-heart fa-lg"></i>
-                                <span>Remover dos favoritos</span>
+                                <span>Remove from favorites</span>
                             </button>
                         </form>
                     </div>

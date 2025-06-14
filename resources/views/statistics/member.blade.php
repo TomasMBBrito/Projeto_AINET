@@ -3,27 +3,27 @@
 @endphp
 @extends('layouts.app')
 
-@section('title', 'Estatísticas Pessoais')
+@section('title', 'Personal Statistics')
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold mb-6">📊 Estatísticas Pessoais</h1>
+    <h1 class="text-2xl font-bold mb-6">📊 Personal Statistics</h1>
 
     <!-- Filtro por mês -->
     <form method="GET" class="mb-6">
-        <label for="month" class="block text-sm font-medium text-gray-700 mb-2">Escolher Mês:</label>
+        <label for="month" class="block text-sm font-medium text-gray-700 mb-2">Choose Month:</label>
         <input type="month" name="month" id="month" value="{{ $selectedMonth }}" class="border border-gray-300 rounded px-3 py-2">
-        <button type="submit" class="ml-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Filtrar</button>
+        <button type="submit" class="ml-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Filter</button>
     </form>
 
     @if ($selectedMonthLabel)
-        <h2 class="text-xl font-semibold mb-4">📅 Estatísticas de {{ $selectedMonthLabel }}</h2>
+        <h2 class="text-xl font-semibold mb-4">📅 Statistics {{ $selectedMonthLabel }}</h2>
     @endif
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <!-- Total Gasto -->
         <div class="bg-white shadow-md rounded-2xl p-6">
-            <h3 class="text-lg font-semibold mb-4">💸 Total Gasto</h3>
+            <h3 class="text-lg font-semibold mb-4">💸 Total Spending</h3>
             @if ($spendingByMonth->isNotEmpty())
                 <ul class="text-gray-800 text-lg">
                     @foreach ($spendingByMonth as $month => $total)
@@ -34,13 +34,13 @@
                     @endforeach
                 </ul>
             @else
-                <p class="text-gray-600">Sem dados de gastos neste mês.</p>
+                <p class="text-gray-600">No spending data this month.</p>
             @endif
         </div>
 
         <!-- Número de encomendas -->
         <div class="bg-white shadow-md rounded-2xl p-6">
-            <h3 class="text-lg font-semibold mb-4">📦 Número de Encomendas</h3>
+            <h3 class="text-lg font-semibold mb-4">📦 Number of orders</h3>
             <p class="text-3xl font-bold text-green-600">{{ $orderCount }}</p>
         </div>
     </div>
@@ -49,13 +49,13 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Gráfico de gastos por encomenda -->
         <div class="bg-white shadow-md rounded-2xl p-6">
-            <h3 class="text-lg font-semibold mb-4">🧾 Gastos por Encomenda</h3>
+            <h3 class="text-lg font-semibold mb-4">🧾 Spend per order</h3>
             <canvas id="spendingChart"></canvas>
         </div>
 
         <!-- Gráfico de carregamentos -->
         <div class="bg-white shadow-md rounded-2xl p-6">
-            <h3 class="text-lg font-semibold mb-4">💳 Carregamentos no Cartão</h3>
+            <h3 class="text-lg font-semibold mb-4">💳 Card top-ups</h3>
             <canvas id="creditChart"></canvas>
         </div>
     </div>

@@ -3,11 +3,11 @@
 @section('content')
     <div class="max-w-3xl mx-auto px-4 py-8 bg-white rounded-lg shadow">
 
-        <h2 class="text-2xl font-bold text-green-700 mb-6">Editar Produto</h2>
+        <h2 class="text-2xl font-bold text-green-700 mb-6">Edit Product</h2>
 
         @if (session('stock_warning'))
             <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded">
-                <p class="font-bold">Atenção!</p>
+                <p class="font-bold">Attention!</p>
                 <p>{{ session('stock_warning.message') }}</p>
 
                 <form method="POST" action="{{ route('products.update', $product) }}" class="mt-4 flex space-x-3">
@@ -33,11 +33,11 @@
 
                     <button type="submit"
                         class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition">
-                        Confirmar Atualização
+                        Confirm Update
                     </button>
                     <a href="{{ route('products.edit', $product) }}"
                         class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition">
-                        Cancelar
+                        Cancel
                     </a>
                 </form>
             </div>
@@ -49,13 +49,13 @@
             @method('PUT')
 
             <div>
-                <label class="block text-gray-700 font-medium mb-1">Nome</label>
+                <label class="block text-gray-700 font-medium mb-1">Name</label>
                 <input type="text" name="name" required value="{{ old('name', $product->name) }}"
                     class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
             </div>
 
             <div>
-                <label class="block text-gray-700 font-medium mb-1">Categoria</label>
+                <label class="block text-gray-700 font-medium mb-1">Category</label>
                 <select name="category_id" required
                     class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
                     @foreach ($categories as $category)
@@ -68,7 +68,7 @@
             </div>
 
             <div>
-                <label class="block text-gray-700 font-medium mb-1">Preço (€)</label>
+                <label class="block text-gray-700 font-medium mb-1">Price (€)</label>
                 <input type="number" step="0.01" name="price" required value="{{ old('price', $product->price) }}"
                     class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
             </div>
@@ -80,46 +80,46 @@
             </div>
 
             <div>
-                <label class="block text-gray-700 font-medium mb-1">Descrição</label>
+                <label class="block text-gray-700 font-medium mb-1">Description</label>
                 <textarea name="description" rows="4" required
                     class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 resize-none">{{ old('description', $product->description) }}</textarea>
             </div>
 
             <div>
-                <label class="block text-gray-700 font-medium mb-1">Imagem atual:</label>
+                <label class="block text-gray-700 font-medium mb-1">Current image:</label>
                 @if ($product->photo)
                     <img src="{{ asset('storage/' . $product->photo) }}" alt="Imagem atual" class="w-24 rounded mb-3">
                 @else
-                    <span class="text-gray-500 mb-3 inline-block">Nenhuma imagem</span>
+                    <span class="text-gray-500 mb-3 inline-block">No image</span>
                 @endif
 
-                <label class="block text-gray-700 font-medium mb-1">Nova Imagem (opcional)</label>
+                <label class="block text-gray-700 font-medium mb-1">New Image (optional)</label>
                 <input type="file" name="image"
                     class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
             </div>
 
             <div>
-                <label class="block text-gray-700 font-medium mb-1">Quantidade mínima para desconto (opcional)</label>
+                <label class="block text-gray-700 font-medium mb-1">Minimum quantity for discount (optional)</label>
                 <input type="number" name="discount_min_qty"
                     value="{{ old('discount_min_qty', $product->discount_min_qty) }}"
                     class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
             </div>
 
             <div>
-                <label class="block text-gray-700 font-medium mb-1">Valor do desconto (€)</label>
+                <label class="block text-gray-700 font-medium mb-1">Discount amount (€)</label>
                 <input type="number" step="0.01" name="discount" value="{{ old('discount', $product->discount) }}"
                     class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
             </div>
 
             <div>
-                <label class="block text-gray-700 font-medium mb-1">Limite mínimo de stock</label>
+                <label class="block text-gray-700 font-medium mb-1">Minimum stock limit</label>
                 <input type="number" name="stock_lower_limit" required
                     value="{{ old('stock_lower_limit', $product->stock_lower_limit) }}"
                     class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
             </div>
 
             <div>
-                <label class="block text-gray-700 font-medium mb-1">Limite máximo de stock</label>
+                <label class="block text-gray-700 font-medium mb-1">Maximum stock limit</label>
                 <input type="number" name="stock_upper_limit" required
                     value="{{ old('stock_upper_limit', $product->stock_upper_limit) }}"
                     class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
@@ -127,7 +127,7 @@
 
             <button type="submit"
                 class="w-full bg-green-600 text-white font-semibold py-3 rounded-lg hover:bg-green-700 transition">
-                Atualizar Produto
+                Update Product
             </button>
         </form>
     </div>

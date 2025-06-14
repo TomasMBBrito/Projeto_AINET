@@ -2,21 +2,21 @@
 
 @section('content')
 <div class="max-w-6xl mx-auto px-4 py-8">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">📊 Estatísticas @if(auth()->user()->is_admin) Administrativas @else Pessoais @endif</h2>
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">@if(auth()->user()->is_admin) Administrative  @else Personal @endif 📊 Statics</h2>
 
     <form method="GET" action="{{ route('statistics') }}" class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
         <div>
-            <label for="month" class="block text-gray-700 font-medium">Filtrar por mês:</label>
+            <label for="month" class="block text-gray-700 font-medium">Filter by month:</label>
             <input type="month" id="month" name="month" value="{{ request('month') }}" class="w-full border border-gray-300 rounded px-3 py-2">
         </div>
 
         <div>
-            <label for="user" class="block text-gray-700 font-medium">Filtrar por membro:</label>
+            <label for="user" class="block text-gray-700 font-medium">Filter by member:</label>
             <input type="text" id="user" name="user" value="{{ request('user') }}" class="w-full border border-gray-300 rounded px-3 py-2">
         </div>
 
         <div>
-            <label for="category" class="block text-gray-700 font-medium">Filtrar por categoria:</label>
+            <label for="category" class="block text-gray-700 font-medium">Filter by category:</label>
             <select name="category_id" id="category" class="w-full border border-gray-300 rounded px-3 py-2">
                 <option value="">Todas</option>
                 @foreach($categories as $category)
@@ -26,9 +26,9 @@
         </div>
 
         <div>
-            <label for="product" class="block text-gray-700 font-medium">Filtrar por produto:</label>
+            <label for="product" class="block text-gray-700 font-medium">Filter by product:</label>
             <select name="product_id" id="product" class="w-full border border-gray-300 rounded px-3 py-2">
-                <option value="">Todos</option>
+                <option value="">All</option>
                 @foreach($products as $product)
                     <option value="{{ $product->id }}" @selected(request('product_id') == $product->id)>{{ $product->name }}</option>
                 @endforeach
@@ -72,7 +72,7 @@
             <canvas id="salesChart"></canvas>
         </div>
 
-        
+
         <div class="bg-white shadow-md rounded-2xl p-6">
             <h3 class="text-lg font-semibold text-gray-700 mb-4">👥 Membros por Mês</h3>
             <canvas id="membersChart"></canvas>
@@ -80,7 +80,7 @@
     </div>
 
     {{-- Tabelas de Dados Adicionais --}}
-    
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div class="bg-white shadow-md rounded-2xl p-6">
             <h3 class="text-lg font-semibold text-gray-700 mb-4">📦 Vendas por Categoria</h3>
@@ -142,7 +142,7 @@
         options: { scales: { y: { beginAtZero: true } } }
     });
 
-    
+
     new Chart(document.getElementById('membersChart'), {
         type: 'bar',
         data: {

@@ -3,10 +3,10 @@
 @section('content')
 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold text-gray-800">Gestão de Categorias</h2>
+        <h2 class="text-2xl font-bold text-gray-800">Category Management</h2>
         <a href="{{ route('categories.create') }}"
            class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700 transition">
-            + Nova Categoria
+            + New Category
         </a>
     </div>
 
@@ -20,9 +20,9 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Nome</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Imagem</th>
-                    <th class="px-6 py-3 text-right text-sm font-semibold text-gray-600">Ações</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Name</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Image</th>
+                    <th class="px-6 py-3 text-right text-sm font-semibold text-gray-600">Action</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
@@ -35,14 +35,14 @@
                                      alt="Imagem da categoria"
                                      class="w-20 h-20 object-cover rounded-md border">
                             @else
-                                <span class="text-sm text-gray-500 italic">Sem imagem</span>
+                                <span class="text-sm text-gray-500 italic">No image</span>
                             @endif
                         </td>
                         <td class="px-6 py-4 text-right space-x-2">
                             @if(!$category->trashed())
                                 <a href="{{ route('categories.edit', $category) }}"
                                    class="inline-block px-5 py-2 bg-yellow-500 text-white text-base font-semibold rounded-md hover:bg-yellow-600 transition">
-                                    Editar
+                                    Edit
                                 </a>
                                 <form action="{{ route('categories.destroy', $category) }}" method="POST" class="inline-block"
                                       onsubmit="return confirm('Tem a certeza que deseja eliminar esta categoria?')">
@@ -50,7 +50,7 @@
                                     @method('DELETE')
                                     <button type="submit"
                                             class="px-5 py-2 bg-red-600 text-white text-base font-semibold rounded-md hover:bg-red-700 transition">
-                                        Eliminar
+                                        Eliminate
                                     </button>
                                 </form>
                             @else
@@ -58,7 +58,7 @@
                                     @csrf
                                     <button type="submit"
                                             class="px-5 py-2 bg-green-600 text-white text-base font-semibold rounded-md hover:bg-green-700 transition">
-                                        Restaurar
+                                        Restore
                                     </button>
                                 </form>
                             @endif
@@ -66,7 +66,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="3" class="px-6 py-4 text-center text-gray-500">Nenhuma categoria encontrada.</td>
+                        <td colspan="3" class="px-6 py-4 text-center text-gray-500">No categories found.</td>
                     </tr>
                 @endforelse
             </tbody>

@@ -12,7 +12,7 @@
         <nav class="flex items-center space-x-3 text-sm">
             <a href="{{ route('favorites.index') }}"
                     class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
-                    <i data-lucide="heart" class="w-4 h-4"></i>
+                    <i data-lucide="heart" class="w-4 h-4"></i> Favorites
             </a>
 
             <a href="{{ route('catalog.index') }}"
@@ -99,7 +99,7 @@
                 <a href="{{ route('profile.show') }}"
                     class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
                     <i data-lucide="user" class="w-4 h-4"></i> Profile
-                </a>               
+                </a>
 
                 <form method="POST" action="{{ route('logout') }}" class="inline">
                     @csrf

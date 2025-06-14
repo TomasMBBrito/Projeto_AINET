@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Gestão de Utilizadores')
+@section('title', 'User Management')
 
 @section('content')
 <div class="max-w-7xl mx-auto mt-10 p-6 bg-white rounded shadow">
-    <h2 class="text-3xl font-bold mb-6">Utilizadores</h2>
+    <h2 class="text-3xl font-bold mb-6">Users</h2>
 
     @if (session('success'))
         <div class="bg-green-100 text-green-800 p-4 rounded mb-4">
@@ -59,7 +59,7 @@
                     <td class="flex flex-wrap gap-2 py-2">
 
                         {{-- Editar --}}
-                        <a href="{{ route('users.edit', $user) }}" 
+                        <a href="{{ route('users.edit', $user) }}"
                            class="inline-flex items-center bg-blue-500 text-white px-5 py-3 rounded hover:bg-blue-600 transition">
                             Edit
                         </a>
@@ -67,7 +67,7 @@
                         {{-- Restaurar ou Cancelar --}}
                         @if ($user->trashed())
                             <form method="POST" action="{{ route('users.restore', $user->id) }}">
-                                @csrf 
+                                @csrf
                                 @method('PUT')
                                 <button type="submit" class="inline-flex items-center bg-yellow-500 text-white px-5 py-3 rounded hover:bg-yellow-600 transition">
                                     Restore
@@ -75,9 +75,9 @@
                             </form>
                         @else
                             <form method="POST" action="{{ route('users.destroy', $user) }}">
-                                @csrf 
+                                @csrf
                                 @method('DELETE')
-                                <button onclick="return confirm('Cancel Subscription?')" 
+                                <button onclick="return confirm('Cancel Subscription?')"
                                         class="inline-flex items-center bg-red-500 text-white px-5 py-3 rounded hover:bg-red-600 transition">
                                     Delete account
                                 </button>
@@ -87,7 +87,7 @@
                         {{-- Promover/Rebaixar --}}
                         @if (in_array($user->type, ['member', 'board']) && $user->id !== auth()->id())
                             <form method="POST" action="{{ route('users.toggleBoard', $user) }}">
-                                @csrf 
+                                @csrf
                                 @method('PUT')
                                 <button type="submit" class="inline-flex items-center bg-purple-500 text-white px-5 py-3 rounded hover:bg-purple-600 transition">
                                     {{ $user->type === 'member' ? 'Promote' : 'Demote' }}
@@ -98,7 +98,7 @@
                         {{-- Bloquear/Desbloquear --}}
                         @if ($user->type !== 'employee')
                             <form method="POST" action="{{ route('users.block', $user) }}">
-                                @csrf 
+                                @csrf
                                 @method('PUT')
                                 <button type="submit" class="inline-flex items-center bg-orange-500 text-white px-5 py-3 rounded hover:bg-orange-600 transition">
                                     {{ $user->blocked ? 'Unblock' : 'block' }}

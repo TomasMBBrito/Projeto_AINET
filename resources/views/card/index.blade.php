@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
-    <h2 class="text-2xl font-bold text-green-700 mb-6">Detalhes do Cartão</h2>
+    <h2 class="text-2xl font-bold text-green-700 mb-6">Card Details</h2>
 
     @if (session('success'))
         <div class="mt-4 p-4 bg-green-100 text-green-700 rounded flex items-center">
@@ -20,15 +20,15 @@
     <div class="bg-white rounded-lg shadow p-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <p class="text-gray-700 font-medium">Titular:</p>
+                <p class="text-gray-700 font-medium">Holder:</p>
                 <p class="text-gray-800">{{ $user->name }}</p>
             </div>
             <div>
-                <p class="text-gray-700 font-medium">Número do Cartão:</p>
+                <p class="text-gray-700 font-medium">Card number:</p>
                 <p class="text-gray-800">{{ $card->card_number }}</p>
             </div>
             <div>
-                <p class="text-gray-700 font-medium">Saldo Disponível:</p>
+                <p class="text-gray-700 font-medium">Available balance:</p>
                 <p class="text-green-700 font-semibold">€{{ number_format($card->balance, 2) }}</p>
             </div>
         </div>
@@ -36,11 +36,11 @@
         <div class="mt-6 flex space-x-4">
             <a href="{{ route('card.credit') }}"
                class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
-                Creditar Cartão
+                Load Card
             </a>
             <a href="{{ route('card.transactions') }}"
                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-                Histórico de Transações
+                Transaction History
             </a>
         </div>
     </div>
