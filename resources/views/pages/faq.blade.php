@@ -10,9 +10,9 @@
         <div class="space-y-4" x-data="{ selected: null }">
             @php
                 $faqs = [
-                    ['title' => 'How do I join the Grocery Club?', 'icon' => 'user-plus', 'content' => 'Simply register an account using the Sign Up button. After creating your account, pay the membership fee to unlock full features.'],
-                    ['title' => 'Can I place an order without being a member?', 'icon' => 'shopping-cart', 'content' => 'Guests can browse and add items to the cart, but only members can complete purchases. Join today to unlock full access.'],
-                    ['title' => 'How does the virtual card work?', 'icon' => 'credit-card', 'content' => 'Once your membership is active, you receive a virtual card used for secure purchases within the platform. It simplifies payments and helps track expenses.'],
+                    ['title' => 'How do I join the Grocery Club?', 'icon' => 'user-plus', 'content' => 'Simply create an free account using the Sign Up button. After creating your account, you can pay the membership fee to unlock our full features designed for you.'],
+                    ['title' => 'Can I place an order without being a member?', 'icon' => 'shopping-cart', 'content' => 'Yes, you can !! Guest members can browse on out catalog and add items to the cart, but only members can complete purchases. Join us today to unlock full access.'],
+                    ['title' => 'How does the virtual card work?', 'icon' => 'credit-card', 'content' => 'Once you create an account, you receive a virtual card used for secure purchases within the platform. It simplifies payments and helps track expenses.'],
                     ['title' => 'What are the delivery options?', 'icon' => 'truck', 'content' => 'We offer home delivery and community group deliveries to reduce costs. You can select your preference at checkout.'],
                     ['title' => 'Is my personal data safe?', 'icon' => 'lock', 'content' => 'Absolutely. We use encrypted communications and secure authentication to keep your data protected.'],
                     ['title' => 'Still have questions?', 'icon' => 'help-circle', 'content' => 'Feel free to reach out to our support team at <a href="#" class="underline text-green-700">support@groceryclub.com</a>.'],

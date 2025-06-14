@@ -11,7 +11,7 @@
         <div class="grid md:grid-cols-2 gap-8">
             <!-- Contact Info -->
             <div class="bg-white p-6 rounded-lg shadow">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">We're here to help</h2>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">We're here to help you</h2>
                 <p class="text-gray-600 mb-4">Feel free to reach out to us with any questions, suggestions, or feedback you may have.</p>
                 <ul class="space-y-3 text-sm text-gray-700">
                     <li class="flex items-center gap-2">

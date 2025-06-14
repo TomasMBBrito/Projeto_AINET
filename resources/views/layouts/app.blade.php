@@ -18,7 +18,9 @@
         @apply block px-4 py-2 text-white hover:bg-green-700 transition;
     }
 </style>
-    <!-- Adicione outros links de CSS ou fontes conforme necessário -->
+<script>
+    lucide.createIcons();
+</script>
 </head>
 <body class="bg-gray-50 text-gray-800">
 

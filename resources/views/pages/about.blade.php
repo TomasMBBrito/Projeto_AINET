@@ -8,8 +8,8 @@
         <h1 class="text-3xl font-bold text-green-700 mb-4">About Grocery Club</h1>
 
         <p class="text-gray-700 text-base mb-6">
-            Welcome to <strong>Grocery Club</strong> — your community-powered online grocery marketplace!
-            Our mission is to make grocery shopping more accessible, affordable, and sustainable by connecting members directly with local producers and trusted suppliers.
+            Welcome to our <strong>Grocery Club</strong> — Your community online grocery marketplace!
+            Our main goal is to make grocery shopping more accessible, affordable, and sustainable by connecting members directly with our local producers and suppliers.
         </p>
 
         <div class="grid md:grid-cols-2 gap-6 mb-8">
@@ -18,8 +18,8 @@
                     <i data-lucide="users" class="w-5 h-5"></i> A Club for Everyone
                 </h2>
                 <p class="text-gray-600">
-                    Members of the club enjoy exclusive access to fresh products, community discounts, and shared delivery options.
-                    Whether you’re a regular shopper, employee, or part of our board, your experience is tailored for you.
+                    Members of the club can enjoy exclusive access to our fresh products, big discounts, and shared delivery options.
+                    Whether you are a regular shopper, an employee, or a member of our board, your experience is tailored for you.
                 </p>
             </div>
             <div>
@@ -27,7 +27,7 @@
                     <i data-lucide="leaf" class="w-5 h-5"></i> Sustainable Shopping
                 </h2>
                 <p class="text-gray-600">
-                    We care about the planet. By centralizing deliveries and prioritizing local goods, Grocery Club helps reduce packaging waste and carbon emissions.
+                    We do care about the planet. We centralize all deliveries and prioritize local goods, so that way our Grocery Club can reduce packaging waste and carbon emissions.
                 </p>
             </div>
         </div>
@@ -52,10 +52,10 @@
 
         <div class="bg-green-50 p-6 rounded shadow-sm">
             <h2 class="text-xl font-semibold text-green-800 mb-3 flex items-center gap-2">
-                <i data-lucide="mail" class="w-5 h-5"></i> Get in Touch
+                <i data-lucide="mail" class="w-5 h-5"></i> Get in Touch with us
             </h2>
-            <p class="text-gray-700 mb-2">Questions? Feedback? We'd love to hear from you!</p>
-            <p class="text-gray-600">Reach us at: <a href="mailto:support@groceryclub.com" class="text-green-700 underline">support@groceryclub.com</a></p>
+            <p class="text-gray-700 mb-2">Do you have questions? You want to give us your Feedback?</p>
+            <p class="text-gray-600">You can reach us at: <a href="#" class="text-green-700 underline">support@groceryclub.com</a></p>
         </div>
     </div>
 </div>
