@@ -160,7 +160,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/card/transactions', [CardController::class, 'transactions'])->name('card.transactions');
 
     Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics');
-    Route::get('/statistics/export', [StatisticsController::class, 'exportSales'])->name('statistics.export');
+    Route::get('/statistics/exportXLSX', [StatisticsController::class, 'exportSalesXLSX'])->name('statistics.exportXLSX');
+    Route::get('/statistics/exportCSV', [StatisticsController::class, 'exportSalesCSV'])->name('statistics.exportCSV');
+
 });
 
 

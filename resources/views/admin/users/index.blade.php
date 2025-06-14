@@ -26,12 +26,12 @@
         <form method="GET" action="{{ route('users.index') }}" class="flex gap-2 flex-wrap">
             <input type="text" name="search" placeholder="Procurar..." class="border border-gray-300 p-2 rounded" value="{{ request('search') }}">
             <select name="type" class="border border-gray-300 p-2 rounded">
-                <option value="">Todos</option>
-                <option value="member" {{ request('type') == 'member' ? 'selected' : '' }}>Membro</option>
-                <option value="board" {{ request('type') == 'board' ? 'selected' : '' }}>Direção</option>
-                <option value="employee" {{ request('type') == 'employee' ? 'selected' : '' }}>Funcionário</option>
+                <option value="">All</option>
+                <option value="member" {{ request('type') == 'member' ? 'selected' : '' }}>Member</option>
+                <option value="board" {{ request('type') == 'board' ? 'selected' : '' }}>Board</option>
+                <option value="employee" {{ request('type') == 'employee' ? 'selected' : '' }}>Employee</option>
             </select>
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Filtrar</button>
+            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Filter</button>
         </form>
 
         <a href="{{ route('users.create') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">New Employee</a>
@@ -61,7 +61,7 @@
                         {{-- Editar --}}
                         <a href="{{ route('users.edit', $user) }}" 
                            class="inline-flex items-center bg-blue-500 text-white px-5 py-3 rounded hover:bg-blue-600 transition">
-                            Editar
+                            Edit
                         </a>
 
                         {{-- Restaurar ou Cancelar --}}
@@ -101,7 +101,7 @@
                                 @csrf 
                                 @method('PUT')
                                 <button type="submit" class="inline-flex items-center bg-orange-500 text-white px-5 py-3 rounded hover:bg-orange-600 transition">
-                                    {{ $user->blocked ? 'Desbloquear' : 'Bloquear' }}
+                                    {{ $user->blocked ? 'Unblock' : 'block' }}
                                 </button>
                             </form>
                         @endif
@@ -113,7 +113,7 @@
     </table>
 
     <div class="mt-6">
-        {{ $users->links() }}
+        {{ $users->appends(request()->query())->links() }}
     </div>
 </div>
 @endsection

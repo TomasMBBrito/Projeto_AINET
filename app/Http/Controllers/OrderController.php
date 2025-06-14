@@ -68,7 +68,7 @@ class OrderController extends Controller
             foreach ($order->products as $product) {
                 if ($product->stock < $product->order_item->quantity) {
                     DB::rollBack();
-                    return back()->with('error', "O produto '{$product->name}' não tem stock suficiente.");
+                    return back()->with('error', "The product '{$product->name}' doesn`t heave enough stock.");
                 }
             }
 
@@ -82,14 +82,14 @@ class OrderController extends Controller
 
             // (Opcional) Gerar PDF e enviar email
             // Envia email ao cliente
-            //Mail::to($order->member->email)->send(new OrderCompletedMail($order));
+            Mail::to($order->member->email)->send(new OrderCompletedMail($order));
 
             DB::commit();
-            return back()->with('success', 'Pedido marcado como concluído.');
+            return back()->with('success', 'Order complete.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Ocorreu um erro ao completar o pedido.');
+            return back()->with('error', 'ERROR ! Could not complete the order.');
         }
     }
 

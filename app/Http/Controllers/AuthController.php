@@ -79,15 +79,16 @@ class AuthController extends Controller
             'type' => 'pending_member',
         ]);
 
-        // Criar cartão virtual associado
+        // Disparar evento de registo para verificação de email
+        event(new Registered($user));
+
+        // Create virtual card
         Card::create([
             'id' => $user->id,
             'card_number' => rand(100000, 999999),
             'balance' => 0,
         ]);
 
-        // Disparar evento de registo para verificação de email
-        event(new Registered($user));
         Auth::login($user);
 
         return redirect()->route('verification.send')->with('success', 'Conta criada com sucesso! Verifique o seu email para ativar a conta.');

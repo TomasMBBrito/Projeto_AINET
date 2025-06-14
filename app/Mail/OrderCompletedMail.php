@@ -21,6 +21,6 @@ class OrderCompletedMail extends Mailable
     public function build()
     {
         return $this->subject('Your Order is Completed')
-                    ->markdown('emails.orders.completed');
+                    ->markdown('orders.completed');
     }
 }

@@ -48,6 +48,7 @@ class UserManagementController extends Controller
         }
 
         $validated['type'] = 'employee';
+        $validated['email_verified_at'] = now();
         $validated['password'] = Hash::make($validated['password']);
 
         User::create($validated);
