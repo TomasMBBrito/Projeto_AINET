@@ -12,7 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-
 use Illuminate\Routing\Controller as BaseController;
 
 class CardController extends BaseController
@@ -58,6 +57,13 @@ class CardController extends BaseController
             'amount' => 'required|numeric|min:0.01',
             'payment_type' => 'required|in:Visa,PayPal,MB WAY',
             'payment_reference' => 'required',
+        ], [
+            'amount.required' => 'O montante é obrigatório.',
+            'amount.numeric' => 'O montante deve ser um valor numérico.',
+            'amount.min' => 'O montante deve ser no mínimo 0.01€.',
+            'payment_type.required' => 'O método de pagamento é obrigatório.',
+            'payment_type.in' => 'O método de pagamento selecionado é inválido.',
+            'payment_reference.required' => 'A referência de pagamento é obrigatória.',
         ]);
 
         $user = Auth::user();
@@ -77,20 +83,33 @@ class CardController extends BaseController
             case 'Visa':
                 $cvc_code = $request->input('cvc_code');
                 $request->validate([
-                    'payment_reference' => 'digits:16',
-                    'cvc_code' => 'required|digits:3',
+                    'payment_reference' => 'digits:16|numeric',
+                    'cvc_code' => 'required|digits:3|numeric',
+                ], [
+                    'payment_reference.digits' => 'O número do cartão deve ter exatamente 16 dígitos.',
+                    'payment_reference.numeric' => 'O número do cartão deve conter apenas dígitos.',
+                    'cvc_code.required' => 'O código CVC é obrigatório.',
+                    'cvc_code.digits' => 'O código CVC deve ter exatamente 3 dígitos.',
+                    'cvc_code.numeric' => 'O código CVC deve conter apenas dígitos.',
                 ]);
                 $payment_success = Payment::payWithVisa($payment_reference, $cvc_code);
                 break;
             case 'PayPal':
                 $request->validate([
-                    'payment_reference' => 'email',
+                    'payment_reference' => 'email|max:255',
+                ], [
+                    'payment_reference.email' => 'O email do PayPal deve ser válido.',
+                    'payment_reference.max' => 'O email do PayPal não pode exceder 255 caracteres.',
                 ]);
                 $payment_success = Payment::payWithPaypal($payment_reference);
                 break;
             case 'MB WAY':
                 $request->validate([
-                    'payment_reference' => 'digits:9|starts_with:9',
+                    'payment_reference' => 'digits:9|numeric|starts_with:9',
+                ], [
+                    'payment_reference.digits' => 'O número de telemóvel deve ter exatamente 9 dígitos.',
+                    'payment_reference.numeric' => 'O número de telemóvel deve conter apenas dígitos.',
+                    'payment_reference.starts_with' => 'O número de telemóvel deve começar com 9.',
                 ]);
                 $payment_success = Payment::payWithMBway($payment_reference);
                 break;
