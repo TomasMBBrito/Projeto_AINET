@@ -7,23 +7,62 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold mb-6">📊 Personal Statistics</h1>
+    <h1 class="text-2xl font-bold mb-6">Personal Statistics</h1>
 
     <!-- Filtro por mês -->
-    <form method="GET" class="mb-6">
-        <label for="month" class="block text-sm font-medium text-gray-700 mb-2">Choose Month:</label>
-        <input type="month" name="month" id="month" value="{{ $selectedMonth }}" class="border border-gray-300 rounded px-3 py-2">
-        <button type="submit" class="ml-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Filter</button>
+    <form method="GET" class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <div>
+            <label for="month" class="block text-gray-700 font-medium">Filter by month:</label>
+            <select id="month" name="month" class="w-full border border-gray-300 rounded px-3 py-2">
+                <option value="">All</option>
+                @php
+                    $start = now()->subYears(2); // ou ajusta para quantos anos quiseres
+                    $end = now();
+                @endphp
+                @for ($date = $end; $date >= $start; $date->subMonth())
+                    @php
+                        $value = $date->format('Y-m');
+                        $label = $date->translatedFormat('F \d\e Y'); // ex: Junho de 2025
+                    @endphp
+                    <option value="{{ $value }}" @selected(request('month') == $value)>{{ ucfirst($label) }}</option>
+                @endfor
+            </select>
+        </div>
+
+        <div>
+            <label for="category" class="block text-gray-700 font-medium">Filter by category:</label>
+            <select name="category_id" id="category" class="w-full border border-gray-300 rounded px-3 py-2">
+                <option value="">All</option>
+                @foreach($categories as $category)
+                    <option value="{{ $category->id }}" @selected(request('category_id') == $category->id)>{{ $category->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div>
+            <label for="product" class="block text-gray-700 font-medium">Filter by product:</label>
+            <select name="product_id" id="product" class="w-full border border-gray-300 rounded px-3 py-2">
+                <option value="">All</option>
+                @foreach($products as $product)
+                    <option value="{{ $product->id }}" @selected(request('product_id') == $product->id)>{{ $product->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="md:col-span-4 flex items-center space-x-4 mt-4">
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Filter</button>
+            <a href="{{ route('statistics') }}" class="text-gray-500 hover:underline">Clear</a>
+        </div>
     </form>
 
     @if ($selectedMonthLabel)
-        <h2 class="text-xl font-semibold mb-4">📅 Statistics {{ $selectedMonthLabel }}</h2>
+        <h2 class="text-xl font-semibold mb-4">Statistics {{ $selectedMonthLabel }}</h2>
     @endif
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <!-- Total Gasto -->
         <div class="bg-white shadow-md rounded-2xl p-6">
-            <h3 class="text-lg font-semibold mb-4">💸 Total Spending</h3>
+            <h3 class="text-lg font-semibold mb-4">Total Spending</h3>
             @if ($spendingByMonth->isNotEmpty())
                 <ul class="text-gray-800 text-lg">
                     @foreach ($spendingByMonth as $month => $total)

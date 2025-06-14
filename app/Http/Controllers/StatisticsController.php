@@ -18,10 +18,25 @@ class StatisticsController extends Controller
 {
     public function index(Request $request)
     {
-         $user = \App\Models\User::find(Auth::id());
+         $user = User::find(Auth::id());
 
         if ($user->type === 'board' || $user->type === 'employee') {
             $month = $request->input('month');
+
+            $year = null;
+            $monthNumber = null;
+            if ($month) {
+                try {
+                    $date = Carbon::createFromFormat('Y-m', $month);
+                    $year = $date->year;
+                    $monthNumber = $date->month;
+                } catch (\Exception $e) {
+                    $year = null;
+                    $month = null;
+                }
+            }
+
+
             $username = $request->input('user');
             $user_id = null;
 
@@ -37,23 +52,13 @@ class StatisticsController extends Controller
             }
             $categoryId = $request->input('category_id');
             $productId = $request->input('product_id');
-            $year = null;
-            $monthNumber = null;
-            if ($month) {
-                try {
-                    $date = Carbon::createFromFormat('Y-m', $month);
-                    $year = $date->year;
-                    $monthNumber = $date->month;
-                } catch (\Exception $e) {
-                }
-            }
 
             $salesByMonth = $this->getSalesByMonth($year, $monthNumber, $user_id, $categoryId, $productId);
             $membersCountByMonth = $this->getMembersCountByMonth($year, $monthNumber);
             $topProducts = $this->getTopProducts($year, $monthNumber, $categoryId, $user_id);
             $salesByUser = $this->getSalesByUser($year, $monthNumber, $categoryId, $productId);
             $salesByCategory = $this->getSalesByCategory($year, $monthNumber, $user_id, $productId);
-            $summary = $this->getSalesSummary($year,$month);
+            $summary = $this->getSalesSummary($year,$monthNumber,$user_id, $categoryId, $productId);
 
             return view('statistics.admin', [
                 'salesByMonth' => $salesByMonth,
@@ -70,17 +75,21 @@ class StatisticsController extends Controller
         }
 
         $month = $request->input('month'); // formato "YYYY-MM"
+        $categoryId = $request->input('category_id');
+        $productId = $request->input('product_id');
 
         // Para mostrar o mês por extenso
         $selectedMonthLabel = $month ? Carbon::createFromFormat('Y-m', $month)->translatedFormat('F Y') : null;
 
         return view('statistics.member', [
-            'spendingByMonth' => $this->getSpendingByMonth($user->id, $month),
-            'orderCount' => $this->getOrderCount($user->id, $month),
-            'orderSpending' => $this->getOrderSpending($user->id, $month),
+            'spendingByMonth' => $this->getSpendingByMonth($user->id, $month,$categoryId, $productId),
+            'orderCount' => $this->getOrderCount($user->id, $month, $categoryId, $productId),
+            'orderSpending' => $this->getOrderSpending($user->id, $month, $categoryId, $productId),
             'creditsAdded' => $this->getCreditsAdded($user->id, $month),
             'selectedMonth' => $month,
             'selectedMonthLabel' => $selectedMonthLabel,
+            'categories' => Category::all(),
+            'products' => Product::all(),
         ]);
     }
 
@@ -117,12 +126,28 @@ class StatisticsController extends Controller
     }
 
 
-    private function getSalesSummary($year = null, $month = null)
+    private function getSalesSummary($year = null, $month = null, $user = null, $categoryId = null, $productId = null)
     {
-        $query = Operation::where('type', 'debit')->where('debit_type', 'order');
+        $query = Operation::where('type', 'debit')
+    ->where('debit_type', 'order')
+    ->join('orders', 'operations.order_id', '=', 'orders.id')
+    ->join('items_orders', 'orders.id', '=', 'items_orders.order_id')
+    ->join('products', 'items_orders.product_id', '=', 'products.id');
 
         if ($year && $month) {
-            $query->whereYear('date', $year)->whereMonth('date', $month);
+            $query->whereYear('operations.date', $year)->whereMonth('operations.date', $month);
+        }
+
+        if ($user) {
+            $query->where('operations.card_id', $user);
+        }
+
+        if ($categoryId) {
+            $query->where('products.category_id', $categoryId);
+        }
+
+        if ($productId) {
+            $query->where('products.id', $productId);
         }
 
         return $query->selectRaw('
@@ -145,8 +170,7 @@ class StatisticsController extends Controller
             ->select('categories.name', DB::raw('SUM(items_orders.quantity * items_orders.unit_price) as total'));
 
         if ($year && $month) {
-            $query->whereYear('operations.date', $year)
-                ->whereMonth('operations.date', $month);
+            $query->whereYear('operations.date', $year)->whereMonth('operations.date', $month);
         }
 
         if ($user) {
@@ -206,8 +230,7 @@ class StatisticsController extends Controller
             ->select('products.name', DB::raw('SUM(items_orders.quantity) as total'));
 
         if ($year && $month) {
-            $query->whereYear('operations.date', $year)
-                ->whereMonth('operations.date', $month);
+            $query->whereYear('operations.date', $year)->whereMonth('operations.date', $month);
         }
 
         if ($categoryId) {
@@ -225,37 +248,59 @@ class StatisticsController extends Controller
     }
 
 
-    private function getSpendingByMonth($user, $month = null)
+    private function getSpendingByMonth($user, $month = null, $categoryId = null, $productId = null)
     {
         $query = Operation::where('card_id', $user)
             ->where('type', 'debit')
-            ->where('debit_type', 'order');
+            ->where('debit_type', 'order')
+            ->join('orders', 'operations.order_id', '=', 'orders.id')
+            ->join('items_orders', 'orders.id', '=', 'items_orders.order_id')
+            ->join('products', 'items_orders.product_id', '=', 'products.id');
 
         if ($month) {
             $start = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
             $end = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
-            $query->whereBetween('date', [$start, $end]);
+            $query->whereBetween('operations.date', [$start, $end]);
+        }
+
+        if ($categoryId) {
+            $query->where('products.category_id', $categoryId);
+        }
+
+        if ($productId) {
+            $query->where('products.id', $productId);
         }
 
         return $query
-            ->selectRaw("DATE_FORMAT(date, '%Y-%m') as month, SUM(value) as total")
+            ->selectRaw("DATE_FORMAT(operations.date, '%Y-%m') as month, SUM(operations.value) as total")
             ->groupBy('month')
             ->orderBy('month')
             ->pluck('total', 'month');
     }
 
-    private function getOrderCount($user, $month = null)
+    private function getOrderCount($user, $month = null, $categoryId = null, $productId = null)
     {
-        $query = Order::where('member_id', $user);
+        $query = Order::where('member_id', $user)
+            ->join('items_orders', 'orders.id', '=', 'items_orders.order_id')
+            ->join('products', 'items_orders.product_id', '=', 'products.id');
 
         if ($month) {
             $start = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
             $end = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
-            $query->whereBetween('created_at', [$start, $end]);
+            $query->whereBetween('orders.created_at', [$start, $end]);
+        }
+
+        if ($categoryId) {
+            $query->where('products.category_id', $categoryId);
+        }
+
+        if ($productId) {
+            $query->where('products.id', $productId);
         }
 
         return $query->count();
     }
+
 
     private function getMembersCountByMonth($year = null, $month = null)
     {
@@ -277,23 +322,35 @@ class StatisticsController extends Controller
             ->pluck('total', 'month');
     }
 
-    private function getOrderSpending($user, $month = null)
+    private function getOrderSpending($user, $month = null, $categoryId = null, $productId = null)
     {
         $query = Operation::where('card_id', $user)
             ->where('type', 'debit')
-            ->where('debit_type', 'order');
+            ->where('debit_type', 'order')
+            ->join('orders', 'operations.order_id', '=', 'orders.id')
+            ->join('items_orders', 'orders.id', '=', 'items_orders.order_id')
+            ->join('products', 'items_orders.product_id', '=', 'products.id');
 
         if ($month) {
             $start = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
             $end = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
-            $query->whereBetween('date', [$start, $end]);
+            $query->whereBetween('operations.date', [$start, $end]);
         }
 
-        return $query->selectRaw('DATE(date) as day, SUM(value) as total')
-    ->groupBy('day')
-    ->orderBy('day')
-    ->pluck('total', 'day');
+        if ($categoryId) {
+            $query->where('products.category_id', $categoryId);
+        }
+
+        if ($productId) {
+            $query->where('products.id', $productId);
+        }
+
+        return $query->selectRaw('DATE(operations.date) as day, SUM(operations.value) as total')
+            ->groupBy('day')
+            ->orderBy('day')
+            ->pluck('total', 'day');
     }
+
 
     private function getCreditsAdded($user, $month = null)
     {

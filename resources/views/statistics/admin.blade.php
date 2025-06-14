@@ -2,12 +2,25 @@
 
 @section('content')
 <div class="max-w-6xl mx-auto px-4 py-8">
-    <h2 class="text-2xl font-bold text-gray-800 mb-6">@if(auth()->user()->is_admin) Administrative  @else Personal @endif 📊 Statics</h2>
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">Administrative statistics</h2>
 
     <form method="GET" action="{{ route('statistics') }}" class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
         <div>
             <label for="month" class="block text-gray-700 font-medium">Filter by month:</label>
-            <input type="month" id="month" name="month" value="{{ request('month') }}" class="w-full border border-gray-300 rounded px-3 py-2">
+            <select id="month" name="month" class="w-full border border-gray-300 rounded px-3 py-2">
+                <option value="">All</option>
+                @php
+                    $start = now()->subYears(2); // ou ajusta para quantos anos quiseres
+                    $end = now();
+                @endphp
+                @for ($date = $end; $date >= $start; $date->subMonth())
+                    @php
+                        $value = $date->format('Y-m');
+                        $label = $date->translatedFormat('F \d\e Y'); // ex: Junho de 2025
+                    @endphp
+                    <option value="{{ $value }}" @selected(request('month') == $value)>{{ ucfirst($label) }}</option>
+                @endfor
+            </select>
         </div>
 
         <div>
