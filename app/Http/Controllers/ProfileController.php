@@ -43,7 +43,7 @@ class ProfileController extends Controller
 
         $user->update($data);
 
-        return redirect()->route('profile.show')->with('success', 'Perfil atualizado com sucesso!');
+        return redirect()->route('profile.show')->with('success', 'Profile updated successfully!');
     }
 
     public function changePassword(Request $request)
@@ -56,7 +56,7 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         if (!Hash::check($request->current_password, $user->password)) {
-            return back()->withErrors(['current_password' => 'Password atual incorreta.']);
+            return back()->withErrors(['current_password' => 'Incorrect current password.']);
         }
 
         $user->update([
@@ -68,7 +68,7 @@ class ProfileController extends Controller
 
     public function removePhoto(Request $request)
     {
-        $user = auth()->user();
+        $user = auth()->user;
 
         if ($user->photo) {
             Storage::disk('public')->delete($user->photo);

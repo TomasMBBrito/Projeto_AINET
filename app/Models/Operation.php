@@ -23,10 +23,6 @@ class Operation extends Model
         'date' => 'date',
     ];
 
-    // ======================
-    // === RELAÇÕES ========
-    // ======================
-
     public function card()
     {
         return $this->belongsTo(Card::class);
@@ -36,10 +32,6 @@ class Operation extends Model
     {
         return $this->belongsTo(Order::class);
     }
-
-    // ======================
-    // === MÉTODOS ÚTEIS ===
-    // ======================
 
     public function isCredit()
     {

@@ -20,13 +20,6 @@ class ShippingCost extends Model
         'shipping_cost' => 'decimal:2',
     ];
 
-    // ======================
-    // === MÉTODOS ÚTEIS ===
-    // ======================
-
-    /**
-     * Devolve o custo de envio aplicável a um dado valor de encomenda.
-     */
     public static function getShippingCostForOrderTotal(float $orderTotal): float
     {
         $setting = self::where('min_value_threshold', '<=', $orderTotal)

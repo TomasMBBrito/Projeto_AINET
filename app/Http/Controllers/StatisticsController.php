@@ -12,12 +12,13 @@ use Carbon\Carbon;
 use App\Exports\SalesExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class StatisticsController extends Controller
 {
     public function index(Request $request)
     {
-        $user = auth()->user();
+         $user = \App\Models\User::find(Auth::id());
 
         if ($user->type === 'board' || $user->type === 'employee') {
             $month = $request->input('month');
@@ -26,12 +27,12 @@ class StatisticsController extends Controller
 
             if ($username) {
                 $matchedUser = User::where('name', $username)->first();
-                
+
                 if ($matchedUser) {
                     $user_id = $matchedUser->id;
                 } else {
                     // Pode lançar um erro ou apenas seguir sem filtrar por user
-                    return redirect()->back()->with('error', 'Utilizador não encontrado.');
+                    return redirect()->back()->with('error', 'User not found.');
                 }
             }
             $categoryId = $request->input('category_id');
@@ -44,7 +45,6 @@ class StatisticsController extends Controller
                     $year = $date->year;
                     $monthNumber = $date->month;
                 } catch (\Exception $e) {
-                    // Formato inválido, pode ignorar ou tratar erro
                 }
             }
 

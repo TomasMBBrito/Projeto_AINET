@@ -35,19 +35,19 @@ class AuthController extends Controller
 
             if (is_null($user->email_verified_at)) {
                 Auth::logout();
-                return back()->withErrors(['email' => 'Por favor verifique o seu email antes de iniciar sessão.']);
+                return back()->withErrors(['email' => 'Please check your email before logging in..']);
             }
 
             if (Auth::user()->blocked) {
                 Auth::logout();
-                return back()->withErrors(['email' => 'A sua conta está bloqueada.']);
+                return back()->withErrors(['email' => 'Your account is blocked.']);
             }
 
             CartController::syncCartAfterLogin(Auth::user());
             return redirect()->intended('/');
         }
 
-        return back()->withErrors(['email' => 'Credenciais inválidas.'])->onlyInput('email');
+        return back()->withErrors(['email' => 'Invalid credentials.'])->onlyInput('email');
     }
 
     public function showRegistrationForm()
@@ -71,7 +71,7 @@ class AuthController extends Controller
 
         if ($request->hasFile('photo')) {
             $validated['photo'] = $request->file('photo')->store('profile_photos', 'public');
-        }     
+        }
 
         $user = User::create([
             ...$validated,
@@ -79,10 +79,8 @@ class AuthController extends Controller
             'type' => 'pending_member',
         ]);
 
-        // Disparar evento de registo para verificação de email
         event(new Registered($user));
 
-        // Create virtual card
         Card::create([
             'id' => $user->id,
             'card_number' => rand(100000, 999999),
@@ -91,7 +89,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('verification.send')->with('success', 'Conta criada com sucesso! Verifique o seu email para ativar a conta.');
+        return redirect()->route('verification.send')->with('success', 'Account created successfully! Check your email to activate the account.');
     }
 
     public function logout(Request $request)
@@ -169,7 +167,7 @@ class AuthController extends Controller
     public function resendVerificationEmail(Request $request)
     {
         $request->user()->sendEmailVerificationNotification();
-        return back()->with('message', 'Email de verificação reenviado com sucesso!');
+        return back()->with('message', 'Verification email resent successfully!');
     }
 
     // Check manual para saber se o email já foi verificado (ex: botão "Já verifiquei")
@@ -177,9 +175,9 @@ class AuthController extends Controller
     {
         $user = $request->user();
         if ($user->email_verified_at !== null) {
-            return redirect()->route('login')->with('status', 'Email verificado com sucesso. Pode iniciar sessão.');
+            return redirect()->route('login')->with('status', 'Email verified successfully. You can log in.');
         }
 
-        return back()->withErrors(['email' => 'Ainda não foi feita a verificação do email. Verifique a sua caixa de entrada.']);
+        return back()->withErrors(['email' => 'Email verification has not been completed yet. Please check your inbox..']);
     }
 }

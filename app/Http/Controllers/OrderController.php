@@ -8,7 +8,6 @@ use App\Models\Operation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\CompleteOrderRequest;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Mail\OrderCompletedMail;
 use Illuminate\Support\Facades\Mail;
@@ -24,13 +23,12 @@ class OrderController extends Controller
         if ($user->type === 'member') {
             $query->where('member_id', $user->id);
         } elseif (in_array($user->type, ['employee', 'board'])) {
-            // Employees and board can see all orders
             $query->when(request('status'), function($q) {
                 $q->where('status', request('status'));
             });
         }
 
-        $orders = $query->paginate(20); // Paginação só no fim
+        $orders = $query->paginate(20);
 
         return view('orders.index', [
             'orders' => $orders,
@@ -41,9 +39,7 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        // Carrega os produtos da encomenda
         $order->load('products');
-
         return view('orders.show', compact('order'));
     }
 
@@ -51,12 +47,10 @@ class OrderController extends Controller
     {
         $user = Auth::user();
 
-        // Permitir apenas admin e employee
         if (!in_array($user->type, ['employee', 'board'])) {
             abort(403, 'Unauthorized action.');
         }
 
-        // Verificar se o pedido está pendente
         if ($order->status !== 'pending') {
             return back()->with('error', 'Only pending orders can be completed.');
         }
@@ -64,7 +58,6 @@ class OrderController extends Controller
         DB::beginTransaction();
 
         try {
-            // Verificar stock de todos os produtos
             foreach ($order->products as $product) {
                 if ($product->stock < $product->order_item->quantity) {
                     DB::rollBack();
@@ -72,15 +65,12 @@ class OrderController extends Controller
                 }
             }
 
-            // Atualizar stock
             foreach ($order->products as $product) {
                 $product->decrement('stock', $product->order_item->quantity);
             }
 
-            // Atualizar o estado da encomenda
             $order->update(['status' => 'completed']);
 
-            // (Opcional) Gerar PDF e enviar email
             // Envia email ao cliente
             Mail::to($order->member->email)->send(new OrderCompletedMail($order));
 
@@ -95,12 +85,10 @@ class OrderController extends Controller
 
     public function showCancelForm(Order $order)
     {
-        // Opcional: garantir que só 'board' e 'employee' podem cancelar
         if (!in_array(Auth::user()->type, ['employee', 'board'])) {
             abort(403);
         }
 
-        // Redirecionar para a view do formulário de cancelamento
         return view('orders.cancel', compact('order'));
     }
 
@@ -110,7 +98,6 @@ class OrderController extends Controller
             'cancel_reason' => 'required|string|max:255'
         ]);
 
-        // Verificar antes se o pedido está pendente
         if ($order->status !== 'pending') {
             return back()->with('error', 'Only pending orders can be canceled');
         }
@@ -136,13 +123,7 @@ class OrderController extends Controller
                     $product->stock += $item->quantity;
                     $product->save();
                 }
-                // // Atualizar status da encomenda
-                // $order->update([
-                //     'status' => 'canceled',
-                //     'cancel_reason' => $validated['cancel_reason']
-                // ]);
 
-                // Criar operação de crédito para reembolso
                 Operation::create([
                     'card_id' => $card->id,
                     'type' => 'credit',
@@ -152,7 +133,6 @@ class OrderController extends Controller
                     'order_id' => $order->id
                 ]);
 
-                // Incrementar saldo do cartão
                 $card->increment('balance', $order->total);
             });
 

@@ -84,7 +84,7 @@ class CartController extends BaseController
         ];
         session()->put('cart', $cart);
 
-        return redirect()->route('catalog.index')->with('success', 'Produto adicionado ao carrinho!');
+        return redirect()->route('catalog.index')->with('success', 'Product added to cart!');
     }
 
     public function update(Request $request)
@@ -108,7 +108,7 @@ class CartController extends BaseController
         }
         session()->put('cart', $cart);
 
-        return redirect()->route('cart.index')->with('success', 'Quantidade atualizada!');
+        return redirect()->route('cart.index')->with('success', 'Updated quantity!');
     }
 
     public function remove(Request $request)
@@ -125,13 +125,13 @@ class CartController extends BaseController
             session()->put('cart', $cart);
         }
 
-        return redirect()->route('cart.index')->with('success', 'Produto removido do carrinho!');
+        return redirect()->route('cart.index')->with('success', 'Product removed from cart!');
     }
 
     public function clearCart(Request $request)
     {
         session()->forget('cart');
-        return redirect()->route('cart.index')->with('success', 'Carrinho limpo com sucesso!');
+        return redirect()->route('cart.index')->with('success', 'Cart successfully cleaned!');
     }
 
     public function checkout(Request $request)
@@ -143,27 +143,27 @@ class CartController extends BaseController
 
         if (!Auth::check()) {
             session()->put('checkout_data', $request->only(['nif', 'delivery_address']));
-            return redirect()->route('login')->with('error', 'Por favor, faça login para completar a compra.');
+            return redirect()->route('login')->with('error', 'Please log in to complete your purchase..');
         }
 
         $user = Auth::user();
         $card = Card::where('id', $user->id)->first();
 
         if (!$card) {
-            return redirect()->route('card.index')->with('error', 'É necessário um cartão virtual para continuar.');
+            return redirect()->route('card.index')->with('error', 'A virtual card is required to continue.');
         }
 
         if (!in_array($user->type, ['member', 'board'])) {
-            return redirect()->route('membership.pay')->with('error', 'Apenas membros do clube podem realizar compras.');
+            return redirect()->route('membership.pay')->with('error', 'Only club members can make purchases.');
         }
 
         if ($user->blocked) {
-            return redirect()->route('cart.index')->with('error', 'A tua conta está bloqueada. Contacta o suporte.');
+            return redirect()->route('cart.index')->with('error', 'Your account is blocked. Contact support.');
         }
 
         $sessionCart = session()->get('cart', []);
         if (empty($sessionCart)) {
-            return redirect()->route('cart.index')->with('error', 'O carrinho está vazio.');
+            return redirect()->route('cart.index')->with('error', 'The cart is empty.');
         }
 
         $productIds = array_keys($sessionCart);
@@ -194,13 +194,12 @@ class CartController extends BaseController
         }
 
         if ($hasLowStock) {
-            return redirect()->route('cart.index')->with('error', 'Alguns produtos estão sem stock ou excedem o stock disponível.');
+            return redirect()->route('cart.index')->with('error', 'Some products are out of stock or exceed available stock.');
         }
 
         $shippingCost = ShippingCost::getShippingCostForOrderTotal($totalItems);
         $total = $totalItems + $shippingCost;
 
-        // Store order data in session for confirmation
         session()->put('order_data', [
             'cartItems' => $cartItems,
             'totalItems' => $totalItems,
@@ -216,12 +215,12 @@ class CartController extends BaseController
     public function showConfirm()
     {
         if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Faça login para continuar.');
+            return redirect()->route('login')->with('error', 'Log in to continue.');
         }
 
         $orderData = session()->get('order_data');
         if (!$orderData) {
-            return redirect()->route('cart.index')->with('error', 'Não há dados para confirmar a compra.');
+            return redirect()->route('cart.index')->with('error', 'There is no data to confirm the purchase.');
         }
 
         return view('cart.confirm', compact('orderData'));
@@ -232,7 +231,7 @@ class CartController extends BaseController
 
 
         if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Faça login para continuar.');
+            return redirect()->route('login')->with('error', 'Log in to continue.');
         }
 
         $user = Auth::user();
@@ -240,26 +239,22 @@ class CartController extends BaseController
         $orderData = session()->get('order_data');
 
         if (!$orderData) {
-            return redirect()->route('cart.index')->with('error', 'Não há dados para finalizar a compra.');
+            return redirect()->route('cart.index')->with('error', 'There is no data to finalize the purchase.');
         }
 
         if (!$card) {
-            return redirect()->route('card.index')->with('error', 'Cartão virtual não encontrado.');
+            return redirect()->route('card.index')->with('error', 'Virtual card not found.');
         }
 
-        // Validate card balance
         if ($card->balance < $orderData['total']) {
-            return redirect()->route('card.credit')->with('error', 'Saldo insuficiente no cartão virtual. Por favor, adicione fundos.');
+            return redirect()->route('card.credit')->with('error', 'Insufficient balance on virtual card. Please add funds.');
         }
 
-        // Start a database transaction
         DB::beginTransaction();
         try {
-            // Debit the card
             $card->balance -= $orderData['total'];
             $card->save();
 
-            // Create order
             $order = Order::create([
                 'member_id' => $user->id,
                 'status' => 'pending',
@@ -273,7 +268,6 @@ class CartController extends BaseController
                 'cancel_reason' => null,
             ]);
 
-            // Create order items and update stock
             foreach ($orderData['cartItems'] as $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -289,7 +283,6 @@ class CartController extends BaseController
                 $product->save();
             }
 
-            // Record operation
             Operation::create([
                 'card_id' => $card->id,
                 'type' => 'debit',
@@ -301,14 +294,13 @@ class CartController extends BaseController
                 'payment_reference' => null,
             ]);
 
-            // Clear session data
             session()->forget(['cart', 'order_data']);
 
             DB::commit();
-            return redirect()->route('purchase.index')->with('success', 'Compra concluída com sucesso! Pedido #' . $order->id . ' está a ser preparado.');
+            return redirect()->route('purchase.index')->with('success', 'Purchase completed successfully! Order #' . $order->id . ' is being prepared.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('cart.confirm')->with('error', 'Erro ao finalizar a compra. Tente novamente.');
+            return redirect()->route('cart.confirm')->with('error', 'Error completing purchase. Try again.');
         }
     }
 

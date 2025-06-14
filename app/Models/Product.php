@@ -39,11 +39,4 @@ class Product extends Model
         ->as('order_item');
     }
 
-
-
-    // Relação alternativa (se precisar)
-    // public function orderItems()
-    // {
-    //     return $this->hasMany(OrderItem::class, 'product_id');
-    // }
 }

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Bem-vindo ao Grocery Club')
+@section('title', 'Welcome to Grocery Club')
 
 @section('content')
     <!-- Banner Principal -->

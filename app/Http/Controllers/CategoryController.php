@@ -33,7 +33,7 @@ class CategoryController extends Controller
 
         Category::create($validated);
 
-        return redirect()->route('categories.index')->with('success', 'Categoria criada com sucesso!');
+        return redirect()->route('categories.index')->with('success', 'Category created successfully!');
     }
 
     public function edit(Category $category)
@@ -58,7 +58,7 @@ class CategoryController extends Controller
 
         $category->update($validated);
 
-        return redirect()->route('categories.index')->with('success', 'Categoria atualizada com sucesso!');
+        return redirect()->route('categories.index')->with('success', 'Category updated successfully!');
     }
 
     public function destroy(Category $category)
@@ -69,7 +69,7 @@ class CategoryController extends Controller
             $category->forceDelete(); // hard delete se não tem produtos
         }
 
-        return redirect()->route('categories.index')->with('success', 'Categoria eliminada!');
+        return redirect()->route('categories.index')->with('success', 'Category deleted!');
     }
 
     public function restore($id)

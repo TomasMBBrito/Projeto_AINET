@@ -71,7 +71,7 @@ class ProductController extends Controller
 
         Product::create($validated);
 
-        return redirect()->route('products.index')->with('success', 'Produto criado com sucesso!');
+        return redirect()->route('products.index')->with('success', 'Product created successfully!');
     }
 
     public function edit(Product $product)
@@ -104,12 +104,11 @@ class ProductController extends Controller
                 ->withInput()
                 ->with('stock_warning', [
                     'message' => $request->stock <= $request->stock_lower_limit
-                        ? 'O stock está abaixo do limite mínimo! Confirme para continuar.'
-                        : 'O stock atingiu o limite máximo! Confirme para continuar.'
+                        ? 'Stock is below minimum limit! Confirm to continue.'
+                        : 'Stock has reached maximum limit! Confirm to continue.'
                 ]);
         }
 
-        // Atualização da imagem (se fornecida)
         if ($request->hasFile('image')) {
             if ($product->photo) {
                 Storage::disk('public')->delete($product->photo);
@@ -119,7 +118,7 @@ class ProductController extends Controller
 
         $product->update($validated);
 
-        return redirect()->route('products.index')->with('success', 'Produto atualizado com sucesso!');
+        return redirect()->route('products.index')->with('success', 'Product updated successfully!');
     }
     public function destroy(Product $product)
     {
@@ -129,7 +128,7 @@ class ProductController extends Controller
             $product->forceDelete();
         }
 
-        return redirect()->route('products.index')->with('success', 'Produto eliminado!');
+        return redirect()->route('products.index')->with('success', 'Product eliminated!');
     }
 
     public function restore($id)

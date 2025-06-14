@@ -30,7 +30,7 @@ class ShippingCostController extends Controller
 
         ShippingCost::create($validated);
 
-        return redirect()->route('admin.settings.shipping_costs.index')->with('success', 'Intervalo de custo de envio criado.');
+        return redirect()->route('admin.settings.shipping_costs.index')->with('success', 'Shipping cost range created.');
     }
 
     public function edit(ShippingCost $shippingCost)
@@ -48,11 +48,11 @@ class ShippingCostController extends Controller
 
         $shippingCost->update($validated);
 
-        return redirect()->route('admin.settings.shipping_costs.index')->with('success', 'Intervalo atualizado com sucesso.');
+        return redirect()->route('admin.settings.shipping_costs.index')->with('success', 'Range updated successfully.');
     }
     public function destroy(ShippingCost $shippingCost)
     {
         $shippingCost->delete();
-        return back()->with('success', 'Intervalo removido com sucesso.');
+        return back()->with('success', 'Range removed successfully.');
     }
 }

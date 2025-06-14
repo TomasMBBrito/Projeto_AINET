@@ -6,7 +6,7 @@ use App\Models\Product;
 use App\Models\SupplyOrder;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // Importação adicionada
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class SupplyOrderController extends Controller

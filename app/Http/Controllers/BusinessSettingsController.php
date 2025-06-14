@@ -22,6 +22,6 @@ class BusinessSettingsController extends Controller
         $setting = Setting::first();
         $setting->update($validated);
 
-        return redirect()->route('admin.settings.membership_fee')->with('success', 'Taxa de adesão atualizada com sucesso.');
+        return redirect()->route('admin.settings.membership_fee')->with('success', 'Membership fee updated successfully.');
     }
 }

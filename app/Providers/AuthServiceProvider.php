@@ -8,18 +8,12 @@ use App\Models\User;
 
 class AuthServiceProvider extends ServiceProvider
 {
-    /**
-     * As políticas de autorização do projeto.
-     *
-     * @var array<class-string, class-string>
-     */
+
     protected $policies = [
         //User::class => UserPolicy::class,
     ];
 
-    /**
-     * Regista quaisquer serviços de autenticação/autorização.
-     */
+
     public function boot(): void
     {
         $this->registerPolicies();

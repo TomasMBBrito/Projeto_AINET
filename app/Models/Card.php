@@ -19,7 +19,7 @@ class Card extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id',           // Changed from user_id to id to match the database schema
+        'id',
         'card_number',
         'balance',
     ];
@@ -31,7 +31,7 @@ class Card extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'id', 'id'); // Specify id as the foreign key
+        return $this->belongsTo(User::class, 'id', 'id');
     }
 
     public function operations()

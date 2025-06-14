@@ -25,17 +25,13 @@ class MembershipFeeController extends Controller
 
     public function processMembershipFee(Request $request)
     {
-        $user = Auth::user();
+        $user = \App\Models\User::find(Auth::id());
         $card = Card::where('id', $user->id)->first();
-
-        // if (!$card) {
-        //     return redirect()->route('card.create')->with('error', 'Crie o cartão virtual antes de pagar a quota.');
-        // }
 
         $membershipFee = Setting::getValue('membership_fee', 100);
 
         if ($card->balance < $membershipFee) {
-            return redirect()->route('card.credit')->with('error', 'Saldo insuficiente. Por favor, adicione saldo ao cartão.');
+            return redirect()->route('card.credit')->with('error', 'Insufficient balance. Please add balance to the card.');
         }
 
         // Debitar valor da quota no cartão virtual

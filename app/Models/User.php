@@ -40,9 +40,7 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    /**
-     * Tipos válidos de utilizador.
-     */
+
     public const TYPES = ['pending_member', 'member', 'board', 'employee'];
 
     // Métodos auxiliares de tipo
@@ -67,12 +65,9 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->type === 'pending_member';
     }
 
-    /**
-     * Relação com o cartão virtual.
-     */
     public function cards()
     {
-        return $this->hasOne(Card::class, 'id', 'id'); // Specify id as the foreign key
+        return $this->hasOne(Card::class, 'id', 'id');
     }
 
     public function orders()
@@ -80,9 +75,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Order::class, 'member_id');
     }
 
-    /**
-     * Histórico de operações (através do cartão).
-     */
     public function operations()
     {
         return $this->hasManyThrough(Operation::class, Card::class, 'id', 'card_id');
