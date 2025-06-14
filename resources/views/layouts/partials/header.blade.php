@@ -19,13 +19,7 @@
                 class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
                 <i data-lucide="list" class="w-4 h-4"></i> Catalog
             </a>
-
-            <!-- Novo botão de carrinho de compras -->
-            <a href="{{ route('cart.index') }}"
-                class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
-                <i data-lucide="shopping-cart" class="w-4 h-4"></i> Cart
-            </a>
-
+            
             @auth
                 @if (Auth::user()->type === 'board')
                     <div class="relative group">
@@ -73,23 +67,28 @@
                 @endif
 
                 @if (Auth::user()->type !== 'employee')
+                    <a href="{{ route('cart.index') }}"
+                        class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
+                        <i data-lucide="shopping-cart" class="w-4 h-4"></i> Cart
+                    </a>
+
                     <a href="{{ route('purchase.index') }}"
                         class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
                         <i data-lucide="shopping-cart" class="w-4 h-4"></i> My Purchases
                     </a>
+
+                    <a href="{{ route('card.index') }}"
+                        class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
+                        <i data-lucide="credit-card" class="w-4 h-4"></i> My Card
+                    </a>
                 @endif
 
-                @if (Auth::user()->type == 'pending_member')
+                @if (Auth::user()->type === 'pending_member')
                     <a href="{{ route('membership.pay') }}"
                         class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
                         <i data-lucide="banknote" class="w-4 h-4"></i> Pay Membership
                     </a>
                 @endif
-
-                <a href="{{ route('card.index') }}"
-                    class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
-                    <i data-lucide="credit-card" class="w-4 h-4"></i> My Card
-                </a>
 
                 <a href="{{ route('statistics') }}"
                 class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
@@ -109,6 +108,10 @@
                     </button>
                 </form>
             @else
+                <a href="{{ route('cart.index') }}"
+                    class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
+                    <i data-lucide="shopping-cart" class="w-4 h-4"></i> Cart
+                </a>
                 <a href="{{ route('login') }}"
                     class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
                     <i data-lucide="log-in" class="w-4 h-4"></i> Login

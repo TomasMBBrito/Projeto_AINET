@@ -96,18 +96,20 @@
                     </a>
 
                     {{-- Botão fora da âncora para evitar conflitos de clique --}}
-                    <div class="absolute bottom-4 right-4">
-                        <form action="{{ route('cart.add') }}" method="POST" class="flex items-center">
-                            @csrf
-                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-                            <input type="number" name="quantity" value="1" min="1"
-                                class="w-16 p-1 border rounded mr-2 text-sm" />
-                            <button type="submit"
-                                class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm">
-                                Add to cart
-                            </button>
-                        </form>
-                    </div>
+                    @if(Auth::user()->type !== 'employee')
+                        <div class="absolute bottom-4 right-4">
+                            <form action="{{ route('cart.add') }}" method="POST" class="flex items-center">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                <input type="number" name="quantity" value="1" min="1"
+                                    class="w-16 p-1 border rounded mr-2 text-sm" />
+                                <button type="submit"
+                                    class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm">
+                                    Add to cart
+                                </button>
+                            </form>
+                        </div>
+                    @endif
                 </div>
             @endforeach
         </div>
