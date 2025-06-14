@@ -19,7 +19,7 @@ class UserManagementController extends Controller
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', "%{$request->search}%")
-                  ->orWhere('email', 'like', "%{$request->search}%");
+                    ->orWhere('email', 'like', "%{$request->search}%");
             });
         }
 
@@ -35,26 +35,32 @@ class UserManagementController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'gender' => 'required|in:M,F',
-            'password' => 'required|min:8',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users',
+                'gender' => 'required|in:M,F',
+                'password' => 'required|min:8',
+                'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
 
-        if ($request->hasFile('photo')) {
-            $validated['photo'] = $request->file('photo')->store('profile_photos', 'public');
+            if ($request->hasFile('photo')) {
+                $validated['photo'] = $request->file('photo')->store('profile_photos', 'public');
+            }
+
+            $validated['type'] = 'employee';
+            $validated['email_verified_at'] = now();
+            $validated['password'] = Hash::make($validated['password']);
+
+            User::create($validated);
+
+            return redirect()->route('users.index')->with('success', 'Employee added successfully!');
+
+        } catch (\Throwable $e) {
+            return redirect()->route('users.create')->with('error', $e->getMessage());
         }
-
-        $validated['type'] = 'employee';
-        $validated['email_verified_at'] = now();
-        $validated['password'] = Hash::make($validated['password']);
-
-        User::create($validated);
-
-        return redirect()->route('users.index')->with('success', 'Employee added successfully!');
     }
+
 
     public function edit(User $user)
     {
@@ -113,7 +119,7 @@ class UserManagementController extends Controller
 
     public function toggleBoard(User $user)
     {
-        if($user->blocked){
+        if ($user->blocked) {
             return redirect()->back()->withErrors(['error' => 'You can`t promote a blocked account.']);
         }
         if ($user->type === 'member') {

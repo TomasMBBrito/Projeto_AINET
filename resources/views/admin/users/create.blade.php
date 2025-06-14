@@ -6,6 +6,12 @@
 <div class="max-w-xl mx-auto mt-10 p-6 bg-white shadow rounded">
     <h2 class="text-2xl font-bold mb-6">Add Employee</h2>
 
+    @if (session('error'))
+            <div class="mt-4 p-4 bg-red-100 text-red-700 rounded">
+                {{ session('error') }}
+            </div>
+        @endif
+
     <form method="POST" action="{{ route('users.store') }}" enctype="multipart/form-data">
         @csrf
 
