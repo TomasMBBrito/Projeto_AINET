@@ -23,7 +23,7 @@ use App\Http\Controllers\{
     FavoriteController
 };
 
-// Página inicial
+// Home page
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::middleware('guest')->group(function () {
@@ -31,11 +31,11 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
 
-    // Registo
+    // Sign up
     Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
 
-    // Recuperação de password
+    // password reset
     Route::get('/password/reset', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
     Route::post('/password/email', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
     Route::get('/password/reset/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
@@ -45,13 +45,10 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Página de aviso para verificação
     Route::get('/email/verify', [AuthController::class, 'showVerificationNotice'])->name('verification.send');
 
-    // Reenviar email de verificação
     Route::post('/email/resend', [AuthController::class, 'resendVerificationEmail'])->name('verification.resend');
 
-    // Botão "Já verifiquei"
     Route::post('/email/check', [AuthController::class, 'checkEmailVerified'])->name('verification.check');
 
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])
@@ -81,6 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'changePassword'])->name('profile.password');
+    Route::delete('/profile/photo', [ProfileController::class, 'removePhoto'])->name('profile.removePhoto');
 
     Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::post('/favorites/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
@@ -164,51 +162,3 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/statistics/exportCSV', [StatisticsController::class, 'exportSalesCSV'])->name('statistics.exportCSV');
 
 });
-
-
-//});
-//Route::post('/cart/add', [CatalogController::class, 'addToCart'])->name('cart.add');
-
-// // Gestão de catálogo (mantidas para usuários autenticados)
-// Route::middleware('auth')->group(function () {
-//     // Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
-
-// });
-
-// Gestão de encomendas e stock (mantidas para usuários autenticados)
-// Route::middleware('auth')->group(function () {
-//     Route::get('/orders-stock', [OrdersStockController::class, 'index'])->name('orders-stock.index');
-//     Route::get('/orders-stock/create', [OrdersStockController::class, 'create'])->name('orders-stock.create');
-//     Route::post('/orders-stock', [OrdersStockController::class, 'store'])->name('orders-stock.store');
-//     Route::get('/orders-stock/{order}/edit', [OrdersStockController::class, 'edit'])->name('orders-stock.edit');
-//     Route::put('/orders-stock/{order}', [OrdersStockController::class, 'update'])->name('orders-stock.update');
-//     Route::delete('/orders-stock/{order}', [OrdersStockController::class, 'destroy'])->name('orders-stock.destroy');
-// });
-
-//BussinesSettings
-// Route::middleware(['auth'])->group(function () {
-//     //Categorias | Feito
-//     Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');  //Página index das categorias
-//     Route::get('/categories/create', [CategoryController::class, 'create'])->name('categories.create'); //Criar categoria
-//     Route::get('/categories/{category}', [CategoryController::class, 'edit'])->name('categories.edit'); //Editar categoria
-//     Route::post('/categories/store', [CategoryController::class, 'store'])->name('categories.store');   //Armazenar categoria
-//     Route::put('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update'); //Atualizar categoria
-//     Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');    //Eliminar categoria
-//     Route::post('/categories/restore/{id}', [CategoryController::class, 'restore'])->name('categories.restore');    //Restaurar categoria -> ainda não funciona
-
-//     //Produtos | Feito c/filtragem
-//     Route::get('/products', [ProductController::class, 'index'])->name('products.index');   //Página index dos produtos
-//     Route::get('/products/create', [ProductController::class, 'create'])->name('products.create'); //Criar produto
-//     Route::post('/products/store', [ProductController::class, 'store'])->name('products.store'); //Armazena produto
-//     Route::get('/products/{product}', [ProductController::class, 'edit'])->name('products.edit'); //Editar produto
-//     Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update'); //Atualizar produto
-//     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy'); //Eliminar produto
-//     Route::post('/products/restore/{id}', [ProductController::class, 'restore'])->name('products.restore'); //Eliminação reversível do produto (restaurar)
-
-//     //Taxa de adesão | Feito
-//     Route::get('general', [BusinessSettingsController::class, 'edit'])->name('settings.edit');
-//     Route::post('general', [BusinessSettingsController::class, 'update'])->name('settings.update');
-
-//     //Custos de envio
-//     //Route::get('/shipping-costs', [ShippingCostController::class, 'index'])->name('shipping-costs.index');
-// });

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -63,5 +64,18 @@ class ProfileController extends Controller
         ]);
 
         return back()->with('success', 'Password atualizada com sucesso!');
+    }
+
+    public function removePhoto(Request $request)
+    {
+        $user = auth()->user();
+
+        if ($user->photo) {
+            Storage::disk('public')->delete($user->photo);
+            $user->photo = null;
+            $user->save();
+        }
+
+        return redirect()->back()->with('success', 'Profile photo removed successfully.');
     }
 }

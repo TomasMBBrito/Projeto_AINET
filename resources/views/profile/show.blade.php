@@ -13,6 +13,7 @@
         </div>
     @endif
 
+    {{-- Erros de validação --}}
     @if ($errors->any())
         <div class="bg-red-100 text-red-800 p-4 rounded mb-4">
             <ul class="list-disc list-inside">
@@ -23,6 +24,7 @@
         </div>
     @endif
 
+    {{-- Formulário de atualização de perfil --}}
     <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('PUT')
@@ -49,11 +51,21 @@
             </div>
 
             <div>
-                <label class="block text-gray-700 font-medium">Profile photo</label>
+                <label class="block text-gray-700 font-medium mb-2">Profile photo</label>
+                <div class="flex items-center space-x-4 mb-2">
+                    @if (auth()->user()->photo)
+                        <img src="{{ asset('storage/' . auth()->user()->photo) }}" alt="Foto de Perfil"
+                            class="w-24 h-24 object-cover border border-gray-300 rounded-[20px]">
+                    @else
+                        <div class="w-24 h-24 bg-gray-200 flex items-center justify-center text-gray-500 border border-gray-300 rounded-[20px]">
+                            No photo
+                        </div>
+                    @endif
+                </div>
                 <input type="file" name="photo" class="w-full mt-1 p-2 border border-gray-300 rounded-lg">
             </div>
 
-            @if(auth()->user()->type === 'member' || auth()->user()->type === 'board')
+            @if(auth()->user()->type === 'member' || auth()->user()->type === 'pending_member' || auth()->user()->type === 'board')
                 <div>
                     <label class="block text-gray-700 font-medium">NIF</label>
                     <input type="text" name="nif" value="{{ old('nif', auth()->user()->nif) }}"
@@ -61,7 +73,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-gray-700 font-medium">Delivery Address</label>
+                    <label class="block text-gray-700 font-medium">Delivery address</label>
                     <input type="text" name="default_delivery_address" value="{{ old('default_delivery_address', auth()->user()->default_delivery_address) }}"
                         class="w-full mt-1 p-3 border border-gray-300 rounded-lg">
                 </div>
@@ -92,34 +104,46 @@
         </div>
     </form>
 
+    {{-- Formulário separado para remover foto --}}
+    @if (auth()->user()->photo)
+        <form action="{{ route('profile.removePhoto') }}" method="POST" class="mt-4">
+            @csrf
+            @method('DELETE')
+            <button type="submit"
+                class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg">
+                Remove profile photo
+            </button>
+        </form>
+    @endif
+
     {{-- Alterar password --}}
     <hr class="my-8">
 
-    <h3 class="text-xl font-bold mb-4">Change Password</h3>
+    <h3 class="text-xl font-bold mb-4">Change password</h3>
     <form method="POST" action="{{ route('profile.password') }}" class="space-y-6">
         @csrf
         @method('PUT')
 
         <div>
-            <label class="block text-gray-700 font-medium">Actual Password </label>
+            <label class="block text-gray-700 font-medium">Actual password</label>
             <input type="password" name="current_password" required
                 class="w-full mt-1 p-3 border border-gray-300 rounded-lg">
         </div>
 
         <div>
-            <label class="block text-gray-700 font-medium">New Password</label>
+            <label class="block text-gray-700 font-medium">New password</label>
             <input type="password" name="password" required
                 class="w-full mt-1 p-3 border border-gray-300 rounded-lg">
         </div>
 
         <div>
-            <label class="block text-gray-700 font-medium">Confirm new Password</label>
+            <label class="block text-gray-700 font-medium">Confirm new password</label>
             <input type="password" name="password_confirmation" required
                 class="w-full mt-1 p-3 border border-gray-300 rounded-lg">
         </div>
 
         <button type="submit" class="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-lg">
-            Change Password
+            Change password
         </button>
     </form>
 </div>
