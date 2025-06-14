@@ -18,7 +18,7 @@
         <div>
             <label for="category" class="block text-gray-700 font-medium">Filter by category:</label>
             <select name="category_id" id="category" class="w-full border border-gray-300 rounded px-3 py-2">
-                <option value="">Todas</option>
+                <option value="">All</option>
                 @foreach($categories as $category)
                     <option value="{{ $category->id }}" @selected(request('category_id') == $category->id)>{{ $category->name }}</option>
                 @endforeach
@@ -36,31 +36,31 @@
         </div>
 
         <div class="md:col-span-4 flex items-center space-x-4 mt-4">
-            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Filtrar</button>
-            <a href="{{ route('statistics') }}" class="text-gray-500 hover:underline">Limpar</a>
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Filter</button>
+            <a href="{{ route('statistics') }}" class="text-gray-500 hover:underline">Clear</a>
         </div>
     </form>
 
     @if(request('month'))
-        <p class="mb-6 text-gray-600">Estatísticas para: <strong>{{ \Carbon\Carbon::parse(request('month') . '-01')->translatedFormat('F/Y') }}</strong></p>
+        <p class="mb-6 text-gray-600">Statistics for: <strong>{{ \Carbon\Carbon::parse(request('month') . '-01')->translatedFormat('F/Y') }}</strong></p>
     @endif
 
     {{-- Estatísticas Resumo --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <div class="bg-white shadow-md rounded-2xl p-4 text-center">
-            <p class="text-sm text-gray-500">Total de Vendas (€)</p>
+            <p class="text-sm text-gray-500">Total sales (€)</p>
             <p class="text-2xl font-bold text-green-700">{{ number_format($summary['total_sales'], 2, ',', '.') }}</p>
         </div>
         <div class="bg-white shadow-md rounded-2xl p-4 text-center">
-            <p class="text-sm text-gray-500">Venda Média por Transação (€)</p>
+            <p class="text-sm text-gray-500">Average Sales Per Transaction (€)</p>
             <p class="text-2xl font-bold text-green-700">{{ number_format($summary['average_sales'], 2, ',', '.') }}</p>
         </div>
         <div class="bg-white shadow-md rounded-2xl p-4 text-center">
-            <p class="text-sm text-gray-500">Venda Máxima (€)</p>
+            <p class="text-sm text-gray-500">Maximum Sale (€)</p>
             <p class="text-2xl font-bold text-green-700">{{ number_format($summary['max_sale'], 2, ',', '.') }}</p>
         </div>
         <div class="bg-white shadow-md rounded-2xl p-4 text-center">
-            <p class="text-sm text-gray-500">Venda Mínima (€)</p>
+            <p class="text-sm text-gray-500">Minimum Sale (€)</p>
             <p class="text-2xl font-bold text-green-700">{{ number_format($summary['min_sale'], 2, ',', '.') }}</p>
         </div>
     </div>
@@ -68,13 +68,13 @@
     {{-- Gráficos Gerais --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div class="bg-white shadow-md rounded-2xl p-6">
-            <h3 class="text-lg font-semibold text-gray-700 mb-4">💶 Vendas Mensais (€)</h3>
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Monthly Sales (€)</h3>
             <canvas id="salesChart"></canvas>
         </div>
 
 
         <div class="bg-white shadow-md rounded-2xl p-6">
-            <h3 class="text-lg font-semibold text-gray-700 mb-4">👥 Membros por Mês</h3>
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Members per month</h3>
             <canvas id="membersChart"></canvas>
         </div>
     </div>
@@ -83,7 +83,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div class="bg-white shadow-md rounded-2xl p-6">
-            <h3 class="text-lg font-semibold text-gray-700 mb-4">📦 Vendas por Categoria</h3>
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Sales by Category</h3>
             <ul class="list-disc list-inside text-gray-600">
                 @foreach($salesByCategory as $item)
                     <li>{{ $item->name }} – <strong>{{ number_format($item->total, 2, ',', '.') }}€</strong></li>
@@ -92,7 +92,7 @@
         </div>
 
         <div class="bg-white shadow-md rounded-2xl p-6">
-            <h3 class="text-lg font-semibold text-gray-700 mb-4">👤 Vendas por Membro</h3>
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Sales by Member</h3>
             <ul class="list-disc list-inside text-gray-600">
                 @foreach ($salesByUser as $user)
                     <li>{{ $user->name }} – <strong>{{ number_format($user->total, 2, ',', '.') }}€</strong></li>
@@ -103,23 +103,22 @@
 
     {{-- Top Produtos --}}
     <div class="bg-white shadow-md rounded-2xl p-6 mb-6">
-        <h3 class="text-lg font-semibold text-gray-700 mb-4">Top 5 Produtos Mais Vendidos</h3>
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Top 5 Best Selling Products</h3>
         <ul class="list-disc list-inside text-gray-600">
             @foreach ($topProducts as $product)
-                <li class="mb-1">{{ $product->name }} – <strong>{{ $product->total }}</strong> unidades</li>
+                <li class="mb-1">{{ $product->name }} – <strong>{{ $product->total }}</strong> units</li>
             @endforeach
         </ul>
     </div>
 
-    {{-- Exportações --}}
     <div class="flex justify-end space-x-4">
         <a href="{{ route('statistics.exportXLSX', ['format' => 'xlsx']) }}"
            class="inline-block px-5 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition">
-            ⬇️ Exportar Excel (.xlsx)
+            ⬇️ Export Excel (.xlsx)
         </a>
         <a href="{{ route('statistics.exportCSV', ['format' => 'csv']) }}"
            class="inline-block px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition">
-            ⬇️ Exportar CSV (.csv)
+            ⬇️ Export CSV (.csv)
         </a>
     </div>
 </div>

@@ -10,6 +10,14 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         rel="stylesheet"
     />
+    <style>
+    .nav-link {
+        @apply flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition;
+    }
+    .submenu-link {
+        @apply block px-4 py-2 text-white hover:bg-green-700 transition;
+    }
+</style>
     <!-- Adicione outros links de CSS ou fontes conforme necessário -->
 </head>
 <body class="bg-gray-50 text-gray-800">

@@ -70,9 +70,9 @@ Route::post('/cart/clear-cart', [CartController::class, 'clearCart'])->name('car
 Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
 Route::get('/cart/confirm', [CartController::class, 'showConfirm'])->name('cart.confirm');
 Route::post('/cart/finalize', [CartController::class, 'finalize'])->name('cart.finalize');
-Route::view('/sobre', 'pages.about')->name('about');
-Route::view('/contact', 'pages.about')->name('contact');
-Route::view('/faq', 'pages.about')->name('faq');
+Route::view('/about', 'pages.about')->name('about');
+Route::view('/contact', 'pages.contact')->name('contact');
+Route::view('/faq', 'pages.faq')->name('faq');
 
 // Rotas autenticadas e verificadas
 Route::middleware(['auth', 'verified'])->group(function () {

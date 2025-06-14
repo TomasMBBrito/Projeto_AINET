@@ -2,14 +2,18 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 
 <header class="bg-white shadow">
-    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between flex-wrap">
         <!-- Logotipo -->
         <a href="{{ route('home') }}" class="text-2xl font-bold text-green-700">
             Grocery Club
         </a>
 
+        <button id="menu-toggle" class="lg:hidden text-green-700 focus:outline-none">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+
         <!-- Navegação -->
-        <nav class="flex items-center space-x-3 text-sm">
+        <nav id="menu" class="w-full lg:w-auto mt-4 lg:mt-0 hidden lg:flex flex-col lg:flex-row lg:items-center space-y-2 lg:space-y-0 lg:space-x-3 text-sm">
             <a href="{{ route('favorites.index') }}"
                     class="flex items-center gap-1 text-black hover:text-white hover:bg-green-600 px-3 py-2 rounded transition">
                     <i data-lucide="heart" class="w-4 h-4"></i> Favorites
@@ -128,4 +132,9 @@
 
 <script>
     lucide.createIcons();
+
+    document.getElementById('menu-toggle').addEventListener('click', () => {
+        const menu = document.getElementById('menu');
+        menu.classList.toggle('hidden');
+    });
 </script>
